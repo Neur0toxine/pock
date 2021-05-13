@@ -1,0 +1,28 @@
+{
+    "name": "neur0toxine/pock",
+    "description": "PSR-18 compatible HTTP mock library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Neur0toxine",
+            "email": "pashok9825@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Pock\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.1.0",
+        "psr/http-client": "^1.0",
+        "psr/http-message": "^1.0",
+        "php-http/httplug": "^1.0 || ^2.0"
+    },
+    "provide": {
+        "psr/http-client-implementation": "1.0",
+        "php-http/client-implementation": "1.0",
+        "php-http/async-client-implementation": "1.0"
+    }
+}
