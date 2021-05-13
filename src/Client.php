@@ -19,6 +19,7 @@ use Pock\Promise\HttpRejectedPromise;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 /**
  * Class Client
@@ -31,14 +32,18 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
     /** @var \Pock\MockInterface[] */
     private $mocks;
 
+    /** @var \Psr\Http\Client\ClientInterface|null */
+    private $fallbackClient;
+
     /**
      * Client constructor.
      *
      * @param \Pock\MockInterface[] $mocks
      */
-    public function __construct(array $mocks)
+    public function __construct(array $mocks, ?ClientInterface $fallbackClient = null)
     {
         $this->mocks = $mocks;
+        $this->fallbackClient = $fallbackClient;
     }
 
     /**
@@ -83,6 +88,14 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
                 }
 
                 throw new BrokenMockException($mock);
+            }
+        }
+
+        if (null !== $this->fallbackClient) {
+            try {
+                return new HttpFulfilledPromise($this->fallbackClient->sendRequest($request));
+            } catch (Throwable $throwable) {
+                return new HttpRejectedPromise($throwable);
             }
         }
 

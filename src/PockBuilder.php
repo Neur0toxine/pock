@@ -12,6 +12,7 @@ namespace Pock;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\HostMatcher;
 use Pock\Matchers\MultipleMatcher;
+use Psr\Http\Client\ClientInterface;
 
 /**
  * Class PockBuilder
@@ -33,6 +34,9 @@ class PockBuilder
     /** @var \Pock\MockInterface[] */
     private $mocks;
 
+    /** @var \Psr\Http\Client\ClientInterface|null */
+    private $fallbackClient;
+
     /**
      * PockBuilder constructor.
      */
@@ -48,7 +52,7 @@ class PockBuilder
      *
      * @return $this
      */
-    public function host(string $host): PockBuilder
+    public function matchHost(string $host): PockBuilder
     {
         $this->closePrevious();
         $this->matcher->addMatcher(new HostMatcher($host));
@@ -67,11 +71,26 @@ class PockBuilder
         $this->response = null;
         $this->throwable = null;
         $this->mocks = [];
+
+        return $this;
+    }
+
+    /**
+     * Sets fallback Client. It will be used if no request can be matched.
+     *
+     * @param \Psr\Http\Client\ClientInterface|null $fallbackClient
+     *
+     * @return \Pock\PockBuilder
+     */
+    public function setFallbackClient(?ClientInterface $fallbackClient = null): PockBuilder
+    {
+        $this->fallbackClient = $fallbackClient;
+        return $this;
     }
 
     public function getClient(): Client
     {
-        return new Client($this->mocks);
+        return new Client($this->mocks, $this->fallbackClient);
     }
 
     private function closePrevious(): void
