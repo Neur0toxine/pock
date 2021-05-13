@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * PHP 7.3
+ *
+ * @category SchemeMatcher
+ * @package  Pock\Matchers
+ */
+
+namespace Pock\Matchers;
+
+use Pock\Enum\RequestScheme;
+use Psr\Http\Message\RequestInterface;
+
+/**
+ * Class SchemeMatcher
+ *
+ * @category SchemeMatcher
+ * @package  Pock\Matchers
+ */
+class SchemeMatcher implements RequestMatcherInterface
+{
+    /** @var string */
+    private $scheme;
+
+    /**
+     * SchemeMatcher constructor.
+     *
+     * @param string $scheme
+     */
+    public function __construct(string $scheme = RequestScheme::HTTP)
+    {
+        $this->scheme = $scheme;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function matches(RequestInterface $request): bool
+    {
+        return strtolower($request->getUri()->getScheme()) === strtolower($this->scheme);
+    }
+}

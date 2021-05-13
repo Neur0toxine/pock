@@ -37,6 +37,6 @@ class HostMatcher implements RequestMatcherInterface
      */
     public function matches(RequestInterface $request): bool
     {
-        return $request->getUri()->getHost() === $this->host;
+        return strtolower($request->getUri()->getHost()) === strtolower($this->host);
     }
 }

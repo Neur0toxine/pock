@@ -9,9 +9,13 @@
 
 namespace Pock;
 
+use Pock\Enum\RequestScheme;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\HostMatcher;
 use Pock\Matchers\MultipleMatcher;
+use Pock\Matchers\RequestMatcherInterface;
+use Pock\Matchers\SchemeMatcher;
+use Pock\Matchers\UriMatcher;
 use Psr\Http\Client\ClientInterface;
 
 /**
@@ -46,6 +50,18 @@ class PockBuilder
     }
 
     /**
+     * Match request by its scheme.
+     *
+     * @param string $scheme
+     *
+     * @return $this
+     */
+    public function matchScheme(string $scheme = RequestScheme::HTTP): PockBuilder
+    {
+        return $this->addMatcher(new SchemeMatcher($scheme));
+    }
+
+    /**
      * Matches request by hostname.
      *
      * @param string $host
@@ -54,8 +70,32 @@ class PockBuilder
      */
     public function matchHost(string $host): PockBuilder
     {
+        return $this->addMatcher(new HostMatcher($host));
+    }
+
+    /**
+     * Matches request by the whole URI.
+     *
+     * @param \Psr\Http\Message\UriInterface|string $uri
+     *
+     * @return \Pock\PockBuilder
+     */
+    public function matchUri($uri): PockBuilder
+    {
+        return $this->addMatcher(new UriMatcher($uri));
+    }
+
+    /**
+     * Add custom matcher to the mock.
+     *
+     * @param \Pock\Matchers\RequestMatcherInterface $matcher
+     *
+     * @return \Pock\PockBuilder
+     */
+    public function addMatcher(RequestMatcherInterface $matcher): PockBuilder
+    {
         $this->closePrevious();
-        $this->matcher->addMatcher(new HostMatcher($host));
+        $this->matcher->addMatcher($matcher);
 
         return $this;
     }
@@ -88,6 +128,9 @@ class PockBuilder
         return $this;
     }
 
+    /**
+     * @return \Pock\Client
+     */
     public function getClient(): Client
     {
         return new Client($this->mocks, $this->fallbackClient);
