@@ -70,19 +70,19 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
     public function sendAsyncRequest(RequestInterface $request): Promise
     {
         foreach ($this->mocks as $mock) {
-            if ($mock->isFired()) {
+            if (!$mock->available()) {
                 continue;
             }
 
             if ($mock->getMatcher()->matches($request)) {
                 if (null !== $mock->getResponse()) {
-                    $mock->markAsFired();
+                    $mock->registerHit();
 
                     return new HttpFulfilledPromise($mock->getResponse());
                 }
 
                 if (null !== $mock->getThrowable()) {
-                    $mock->markAsFired();
+                    $mock->registerHit();
 
                     return new HttpRejectedPromise($mock->getThrowable());
                 }

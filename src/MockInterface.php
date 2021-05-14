@@ -22,18 +22,18 @@ use Throwable;
 interface MockInterface
 {
     /**
-     * Marks mock as already used.
+     * Registers a hit to the mock.
      *
      * @return \Pock\MockInterface
      */
-    public function markAsFired(): MockInterface;
+    public function registerHit(): MockInterface;
 
     /**
-     * Returns true if mock was not used yet.
+     * Returns true if mock is still can be used.
      *
      * @return bool
      */
-    public function isFired(): bool;
+    public function available(): bool;
 
     /**
      * Returns matcher for the request.

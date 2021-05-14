@@ -37,6 +37,6 @@ class UriMatcher implements RequestMatcherInterface
      */
     public function matches(RequestInterface $request): bool
     {
-        return strtolower((string) $request->getUri()) === strtolower((string) $this->uri);
+        return ((string) $request->getUri()) === ((string) $this->uri);
     }
 }

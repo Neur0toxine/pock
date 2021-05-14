@@ -35,6 +35,9 @@ class PockBuilder
     /** @var \Throwable|null */
     private $throwable;
 
+    /** @var int */
+    private $maxHits;
+
     /** @var \Pock\MockInterface[] */
     private $mocks;
 
@@ -54,7 +57,7 @@ class PockBuilder
      *
      * @param string $scheme
      *
-     * @return $this
+     * @return self
      */
     public function matchScheme(string $scheme = RequestScheme::HTTP): PockBuilder
     {
@@ -66,7 +69,7 @@ class PockBuilder
      *
      * @param string $host
      *
-     * @return $this
+     * @return self
      */
     public function matchHost(string $host): PockBuilder
     {
@@ -101,6 +104,23 @@ class PockBuilder
     }
 
     /**
+     * Repeat this mock provided amount of times.
+     * For example, if you pass 2 as an argument mock will be able to handle two identical requests.
+     *
+     * @param int $hits
+     *
+     * @return $this
+     */
+    public function repeat(int $hits): PockBuilder
+    {
+        if ($hits > 0) {
+            $this->maxHits = $hits;
+        }
+
+        return $this;
+    }
+
+    /**
      * Resets the builder.
      *
      * @return \Pock\PockBuilder
@@ -110,6 +130,7 @@ class PockBuilder
         $this->matcher = new MultipleMatcher();
         $this->response = null;
         $this->throwable = null;
+        $this->maxHits = 1;
         $this->mocks = [];
 
         return $this;
@@ -143,9 +164,11 @@ class PockBuilder
                 $this->matcher->addMatcher(new AnyRequestMatcher());
             }
 
-            $this->mocks[] = new Mock($this->matcher, $this->response, $this->throwable);
+            $this->mocks[] = new Mock($this->matcher, $this->response, $this->throwable, $this->maxHits);
+            $this->matcher = new MultipleMatcher();
             $this->response = null;
             $this->throwable = null;
+            $this->maxHits = 1;
         }
     }
 }

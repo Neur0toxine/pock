@@ -30,8 +30,11 @@ class Mock implements MockInterface
     /** @var \Throwable|null */
     private $throwable;
 
-    /** @var bool */
-    private $fired = false;
+    /** @var int */
+    private $hits;
+
+    /** @var int */
+    private $maxHits;
 
     /**
      * Mock constructor.
@@ -39,30 +42,40 @@ class Mock implements MockInterface
      * @param \Pock\Matchers\RequestMatcherInterface   $matcher
      * @param \Psr\Http\Message\ResponseInterface|null $response
      * @param \Throwable|null                          $throwable
+     * @param int                                      $maxHits
      */
-    public function __construct(RequestMatcherInterface $matcher, ?ResponseInterface $response, ?Throwable $throwable)
-    {
+    public function __construct(
+        RequestMatcherInterface $matcher,
+        ?ResponseInterface $response,
+        ?Throwable $throwable,
+        int $maxHits
+    ) {
         $this->matcher = $matcher;
         $this->response = $response;
         $this->throwable = $throwable;
+        $this->maxHits = $maxHits;
+        $this->hits = 0;
     }
 
-    public function markAsFired(): MockInterface
+    /**
+     * @inheritDoc
+     */
+    public function registerHit(): MockInterface
     {
-        $this->fired = true;
+        ++$this->hits;
         return $this;
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
-    public function isFired(): bool
+    public function available(): bool
     {
-        return $this->fired;
+        return $this->hits < $this->maxHits;
     }
 
     /**
-     * @return \Pock\Matchers\RequestMatcherInterface
+     * @inheritDoc
      */
     public function getMatcher(): RequestMatcherInterface
     {
@@ -70,7 +83,7 @@ class Mock implements MockInterface
     }
 
     /**
-     * @return \Psr\Http\Message\ResponseInterface|null
+     * @inheritDoc
      */
     public function getResponse(): ?ResponseInterface
     {
@@ -78,7 +91,7 @@ class Mock implements MockInterface
     }
 
     /**
-     * @return \Throwable|null
+     * @inheritDoc
      */
     public function getThrowable(): ?Throwable
     {

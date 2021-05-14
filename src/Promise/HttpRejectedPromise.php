@@ -62,6 +62,8 @@ class HttpRejectedPromise implements Promise
     /**
      * @inheritDoc
      * @throws \Throwable
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function wait($unwrap = true): void
     {
