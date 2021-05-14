@@ -29,7 +29,7 @@ abstract class AbstractRequestMatcherTest extends TestCase
     protected const TEST_URI = self::TEST_SCHEME . '://' . self::TEST_HOST . '/';
 
     /** @var \Nyholm\Psr7\Factory\Psr17Factory */
-    private static $psr17Factory;
+    protected static $psr17Factory;
 
     /**
      * @return \Psr\Http\Message\RequestInterface
