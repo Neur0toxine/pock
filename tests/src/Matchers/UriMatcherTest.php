@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP 7.3
+ * PHP 7.2
  *
  * @category UriMatcherTest
  * @package  Pock\Tests\Matchers

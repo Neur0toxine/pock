@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP 7.3
+ * PHP 7.2
  *
  * @category UniversalMockException
  * @package  Pock\Exception
@@ -26,12 +26,13 @@ class UniversalMockException extends Exception implements
     NetworkExceptionInterface,
     RequestExceptionInterface
 {
+    /** @var mixed */
     private $request;
 
     /**
      * UniversalMockException constructor.
      *
-     * @param $request
+     * @param mixed $request
      */
     public function __construct($request)
     {

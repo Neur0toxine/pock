@@ -21,7 +21,7 @@
         }
     },
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.2.0",
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0",
         "php-http/httplug": "^1.0 || ^2.0"
@@ -32,7 +32,7 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "phpcompatibility/php-compatibility": "^9.3",
         "phpstan/phpstan": "^0.12.87",
-        "jms/serializer": "^3.12",
+        "jms/serializer": "^2 | ^3.12",
         "symfony/phpunit-bridge": "^5.2",
         "symfony/var-dumper": "^5.2",
         "symfony/serializer": "^5.2",
