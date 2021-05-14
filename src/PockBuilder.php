@@ -29,8 +29,8 @@ class PockBuilder
     /** @var \Pock\Matchers\MultipleMatcher */
     private $matcher;
 
-    /** @var \Psr\Http\Message\ResponseInterface|null */
-    private $response;
+    /** @var \Pock\PockResponseBuilder|null */
+    private $responseBuilder;
 
     /** @var \Throwable|null */
     private $throwable;
@@ -121,6 +121,22 @@ class PockBuilder
     }
 
     /**
+     * @param int $statusCode
+     *
+     * @return \Pock\PockResponseBuilder
+     */
+    public function reply(int $statusCode = 200): PockResponseBuilder
+    {
+        if (null === $this->responseBuilder) {
+            $this->responseBuilder = new PockResponseBuilder($statusCode);
+
+            return $this->responseBuilder;
+        }
+
+        return $this->responseBuilder->withStatusCode($statusCode);
+    }
+
+    /**
      * Resets the builder.
      *
      * @return \Pock\PockBuilder
@@ -128,7 +144,7 @@ class PockBuilder
     public function reset(): PockBuilder
     {
         $this->matcher = new MultipleMatcher();
-        $this->response = null;
+        $this->responseBuilder = null;
         $this->throwable = null;
         $this->maxHits = 1;
         $this->mocks = [];
@@ -159,14 +175,25 @@ class PockBuilder
 
     private function closePrevious(): void
     {
-        if (null !== $this->response || null !== $this->throwable) {
+        if (null !== $this->responseBuilder || null !== $this->throwable) {
             if (0 === count($this->matcher)) {
                 $this->matcher->addMatcher(new AnyRequestMatcher());
             }
 
-            $this->mocks[] = new Mock($this->matcher, $this->response, $this->throwable, $this->maxHits);
+            $response = null;
+
+            if (null !== $this->responseBuilder) {
+                $response = $this->responseBuilder->getResponse();
+            }
+
+            $this->mocks[] = new Mock(
+                $this->matcher,
+                $response,
+                $this->throwable,
+                $this->maxHits
+            );
             $this->matcher = new MultipleMatcher();
-            $this->response = null;
+            $this->responseBuilder = null;
             $this->throwable = null;
             $this->maxHits = 1;
         }

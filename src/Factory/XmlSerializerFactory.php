@@ -10,6 +10,7 @@
 namespace Pock\Factory;
 
 use Pock\Creator\JmsXmlSerializerCreator;
+use Pock\Serializer\SerializerInterface;
 
 /**
  * Class XmlSerializerFactory
@@ -19,6 +20,9 @@ use Pock\Creator\JmsXmlSerializerCreator;
  */
 class XmlSerializerFactory extends AbstractSerializerFactory
 {
+    /** @var \Pock\Serializer\SerializerInterface|null */
+    private static $mainSerializer;
+
     /**
      * @inheritDoc
      */
@@ -27,5 +31,21 @@ class XmlSerializerFactory extends AbstractSerializerFactory
         return [
             JmsXmlSerializerCreator::class
         ];
+    }
+
+    /**
+     * @param \Pock\Serializer\SerializerInterface|null $serializer
+     */
+    public static function setSerializer(?SerializerInterface $serializer): void
+    {
+        static::$mainSerializer = $serializer;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function getMainSerializer(): ?SerializerInterface
+    {
+        return static::$mainSerializer;
     }
 }

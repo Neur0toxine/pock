@@ -27,6 +27,10 @@ abstract class AbstractSerializerFactory implements SerializerCreatorInterface
      */
     public static function create(): ?SerializerInterface
     {
+        if (null !== static::getMainSerializer()) {
+            return static::getMainSerializer();
+        }
+
         foreach (static::getCreators() as $creator) {
             if (!method_exists($creator, 'create')) {
                 continue;
@@ -48,4 +52,11 @@ abstract class AbstractSerializerFactory implements SerializerCreatorInterface
      * @return string[]
      */
     abstract protected static function getCreators(): array;
+
+    /**
+     * Returns serializer instance (if it was set by user later).
+     *
+     * @return \Pock\Serializer\SerializerInterface|null
+     */
+    abstract protected static function getMainSerializer(): ?SerializerInterface;
 }
