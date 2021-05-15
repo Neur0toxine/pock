@@ -13,6 +13,7 @@ use Pock\Enum\RequestMethod;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\HostMatcher;
 use Pock\Matchers\MultipleMatcher;
+use Pock\TestUtils\PockTestCase;
 
 /**
  * Class MultipleMatcherTest
@@ -20,7 +21,7 @@ use Pock\Matchers\MultipleMatcher;
  * @category MultipleMatcherTest
  * @package  Pock\Tests\Matchers
  */
-class MultipleMatcherTest extends AbstractRequestMatcherTest
+class MultipleMatcherTest extends PockTestCase
 {
     public function testMatches(): void
     {

@@ -13,7 +13,7 @@ use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
 use Http\Client\Promise\HttpFulfilledPromise;
 use Http\Promise\Promise;
-use Pock\Exception\BrokenMockException;
+use Pock\Exception\IncompleteMockException;
 use Pock\Exception\UnsupportedRequestException;
 use Pock\Promise\HttpRejectedPromise;
 use Psr\Http\Client\ClientInterface;
@@ -87,7 +87,7 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
                     return new HttpRejectedPromise($mock->getThrowable());
                 }
 
-                throw new BrokenMockException($mock);
+                throw new IncompleteMockException($mock);
             }
         }
 

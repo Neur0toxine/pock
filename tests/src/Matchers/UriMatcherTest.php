@@ -10,6 +10,7 @@
 namespace Pock\Tests\Matchers;
 
 use Pock\Matchers\UriMatcher;
+use Pock\TestUtils\PockTestCase;
 
 /**
  * Class UriMatcherTest
@@ -17,7 +18,7 @@ use Pock\Matchers\UriMatcher;
  * @category UriMatcherTest
  * @package  Pock\Tests\Matchers
  */
-class UriMatcherTest extends AbstractRequestMatcherTest
+class UriMatcherTest extends PockTestCase
 {
     public function testMatches(): void
     {

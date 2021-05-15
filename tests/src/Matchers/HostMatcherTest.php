@@ -10,6 +10,7 @@
 namespace Pock\Tests\Matchers;
 
 use Pock\Matchers\HostMatcher;
+use Pock\TestUtils\PockTestCase;
 
 /**
  * Class HostMatcherTest
@@ -17,7 +18,7 @@ use Pock\Matchers\HostMatcher;
  * @category HostMatcherTest
  * @package  Pock\Tests\Matchers
  */
-class HostMatcherTest extends AbstractRequestMatcherTest
+class HostMatcherTest extends PockTestCase
 {
     public function testMatches(): void
     {

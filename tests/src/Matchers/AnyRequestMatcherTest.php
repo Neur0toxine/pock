@@ -10,6 +10,7 @@
 namespace Pock\Tests\Matchers;
 
 use Pock\Matchers\AnyRequestMatcher;
+use Pock\TestUtils\PockTestCase;
 
 /**
  * Class AnyRequestMatcherTest
@@ -17,7 +18,7 @@ use Pock\Matchers\AnyRequestMatcher;
  * @category AnyRequestMatcherTest
  * @package  Pock\Tests\Matchers
  */
-class AnyRequestMatcherTest extends AbstractRequestMatcherTest
+class AnyRequestMatcherTest extends PockTestCase
 {
     public function testMatches(): void
     {

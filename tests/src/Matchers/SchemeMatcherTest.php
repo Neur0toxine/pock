@@ -11,6 +11,7 @@ namespace Pock\Tests\Matchers;
 
 use Pock\Enum\RequestScheme;
 use Pock\Matchers\SchemeMatcher;
+use Pock\TestUtils\PockTestCase;
 
 /**
  * Class SchemeMatcherTest
@@ -18,7 +19,7 @@ use Pock\Matchers\SchemeMatcher;
  * @category SchemeMatcherTest
  * @package  Pock\Tests\Matchers
  */
-class SchemeMatcherTest extends AbstractRequestMatcherTest
+class SchemeMatcherTest extends PockTestCase
 {
     public function testMatches(): void
     {

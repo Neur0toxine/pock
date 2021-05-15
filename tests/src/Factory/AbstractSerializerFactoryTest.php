@@ -14,6 +14,8 @@ use Pock\Factory\JsonSerializerFactory;
 use Pock\Factory\XmlSerializerFactory;
 use Pock\Serializer\CallbackSerializerDecorator;
 use Pock\Serializer\SerializerInterface;
+use Pock\TestUtils\EmptyJsonSerializerDecorator;
+use Pock\TestUtils\EmptyXmlSerializerDecorator;
 
 /**
  * Class AbstractSerializerFactoryTest
@@ -25,12 +27,10 @@ class AbstractSerializerFactoryTest extends TestCase
 {
     public function testSetSerializer(): void
     {
-        $jsonSerializer = new CallbackSerializerDecorator(function ($data) {
-            return 'jsonSerializer';
-        });
-        $xmlSerializer = new CallbackSerializerDecorator(function ($data) {
-            return 'xmlSerializer';
-        });
+        $jsonSerializer = new EmptyJsonSerializerDecorator();
+        $xmlSerializer = new EmptyXmlSerializerDecorator();
+
+        self::assertNotEquals($jsonSerializer, $xmlSerializer);
 
         JsonSerializerFactory::setSerializer($jsonSerializer);
         XmlSerializerFactory::setSerializer($xmlSerializer);

@@ -9,9 +9,11 @@
 
 namespace Pock;
 
+use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\HostMatcher;
+use Pock\Matchers\MethodMatcher;
 use Pock\Matchers\MultipleMatcher;
 use Pock\Matchers\RequestMatcherInterface;
 use Pock\Matchers\SchemeMatcher;
@@ -53,13 +55,25 @@ class PockBuilder
     }
 
     /**
+     * Match request by its method.
+     *
+     * @param string $method
+     *
+     * @return $this
+     */
+    public function matchMethod(string $method): self
+    {
+        return $this->addMatcher(new MethodMatcher($method));
+    }
+
+    /**
      * Match request by its scheme.
      *
      * @param string $scheme
      *
      * @return self
      */
-    public function matchScheme(string $scheme = RequestScheme::HTTP): PockBuilder
+    public function matchScheme(string $scheme): self
     {
         return $this->addMatcher(new SchemeMatcher($scheme));
     }
@@ -71,7 +85,7 @@ class PockBuilder
      *
      * @return self
      */
-    public function matchHost(string $host): PockBuilder
+    public function matchHost(string $host): self
     {
         return $this->addMatcher(new HostMatcher($host));
     }
@@ -81,9 +95,9 @@ class PockBuilder
      *
      * @param \Psr\Http\Message\UriInterface|string $uri
      *
-     * @return \Pock\PockBuilder
+     * @return self
      */
-    public function matchUri($uri): PockBuilder
+    public function matchUri($uri): self
     {
         return $this->addMatcher(new UriMatcher($uri));
     }
@@ -93,9 +107,9 @@ class PockBuilder
      *
      * @param \Pock\Matchers\RequestMatcherInterface $matcher
      *
-     * @return \Pock\PockBuilder
+     * @return self
      */
-    public function addMatcher(RequestMatcherInterface $matcher): PockBuilder
+    public function addMatcher(RequestMatcherInterface $matcher): self
     {
         $this->closePrevious();
         $this->matcher->addMatcher($matcher);
@@ -111,7 +125,7 @@ class PockBuilder
      *
      * @return $this
      */
-    public function repeat(int $hits): PockBuilder
+    public function repeat(int $hits): self
     {
         if ($hits > 0) {
             $this->maxHits = $hits;
@@ -139,9 +153,9 @@ class PockBuilder
     /**
      * Resets the builder.
      *
-     * @return \Pock\PockBuilder
+     * @return self
      */
-    public function reset(): PockBuilder
+    public function reset(): self
     {
         $this->matcher = new MultipleMatcher();
         $this->responseBuilder = null;
@@ -157,9 +171,9 @@ class PockBuilder
      *
      * @param \Psr\Http\Client\ClientInterface|null $fallbackClient
      *
-     * @return \Pock\PockBuilder
+     * @return self
      */
-    public function setFallbackClient(?ClientInterface $fallbackClient = null): PockBuilder
+    public function setFallbackClient(?ClientInterface $fallbackClient = null): self
     {
         $this->fallbackClient = $fallbackClient;
         return $this;
@@ -170,6 +184,7 @@ class PockBuilder
      */
     public function getClient(): Client
     {
+        $this->closePrevious();
         return new Client($this->mocks, $this->fallbackClient);
     }
 

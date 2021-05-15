@@ -34,5 +34,5 @@ EOF;
      * @JMS\Type("string")
      * @JMS\SerializedName("field")
      */
-    private $field = 'test';
+    protected $field = 'test';
 }

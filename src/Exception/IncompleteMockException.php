@@ -3,7 +3,7 @@
 /**
  * PHP 7.2
  *
- * @category BrokenMockException
+ * @category IncompleteMockException
  * @package  Pock\Exception
  */
 
@@ -13,12 +13,12 @@ use Exception;
 use Pock\MockInterface;
 
 /**
- * Class BrokenMockException
+ * Class IncompleteMockException
  *
- * @category BrokenMockException
+ * @category IncompleteMockException
  * @package  Pock\Exception
  */
-class BrokenMockException extends Exception
+class IncompleteMockException extends Exception
 {
     /** @var \Pock\MockInterface */
     private $mock;

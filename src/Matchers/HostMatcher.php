@@ -29,7 +29,7 @@ class HostMatcher implements RequestMatcherInterface
      */
     public function __construct(string $host)
     {
-        $this->host = $host;
+        $this->host = strtolower($host);
     }
 
     /**
@@ -37,6 +37,6 @@ class HostMatcher implements RequestMatcherInterface
      */
     public function matches(RequestInterface $request): bool
     {
-        return strtolower($request->getUri()->getHost()) === strtolower($this->host);
+        return strtolower($request->getUri()->getHost()) === $this->host;
     }
 }

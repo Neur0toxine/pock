@@ -13,10 +13,12 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Pock\Exception\JsonException;
+use Pock\Exception\XmlException;
 use Pock\Factory\JsonSerializerFactory;
 use Pock\Factory\XmlSerializerFactory;
 use Pock\Serializer\SerializerInterface;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 /**
  * Class PockResponseBuilder
@@ -27,16 +29,16 @@ use Psr\Http\Message\ResponseInterface;
 class PockResponseBuilder
 {
     /** @var \Psr\Http\Message\ResponseInterface */
-    private $response;
+    protected $response;
 
     /** @var Psr17Factory */
-    private $factory;
+    protected $factory;
 
     /** @var SerializerInterface|null */
-    private static $jsonSerializer;
+    protected static $jsonSerializer;
 
     /** @var SerializerInterface|null */
-    private static $xmlSerializer;
+    protected static $xmlSerializer;
 
     /**
      * PockResponseBuilder constructor.
@@ -54,11 +56,75 @@ class PockResponseBuilder
      *
      * @param int $statusCode
      *
-     * @return \Pock\PockResponseBuilder
+     * @return self
      */
-    public function withStatusCode(int $statusCode = 200): PockResponseBuilder
+    public function withStatusCode(int $statusCode = 200): self
     {
         $this->response = $this->response->withStatus($statusCode);
+
+        return $this;
+    }
+
+    /**
+     * Respond with specified header value.
+     * @see \Psr\Http\Message\MessageInterface::withHeader()
+     *
+     * @param string          $name
+     * @param string|string[] $value
+     *
+     * @return self
+     */
+    public function withHeader(string $name, $value): self
+    {
+        $this->response = $this->response->withHeader($name, $value);
+
+        return $this;
+    }
+
+    /**
+     * Respond with specified header value appended to existing header.
+     * @see \Psr\Http\Message\MessageInterface::withAddedHeader()
+     *
+     * @param string          $name
+     * @param string|string[] $value
+     *
+     * @return self
+     */
+    public function withAddedHeader(string $name, $value): self
+    {
+        $this->response = $this->response->withAddedHeader($name, $value);
+
+        return $this;
+    }
+
+    /**
+     * Respond with specified headers. Works exactly like calling PockResponseBuilder::withHeader() would work.
+     *
+     * @param array<string, string|string[]> $headers
+     *
+     * @return self
+     */
+    public function withHeaders(array $headers): self
+    {
+        foreach ($headers as $name => $value) {
+            $this->response = $this->response->withHeader($name, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Respond with specified headers. Works exactly like calling PockResponseBuilder::withAddedHeader() would work.
+     *
+     * @param array<string, string|string[]> $headers
+     *
+     * @return self
+     */
+    public function withAddedHeaders(array $headers): self
+    {
+        foreach ($headers as $name => $value) {
+            $this->response = $this->response->withAddedHeader($name, $value);
+        }
 
         return $this;
     }
@@ -71,9 +137,9 @@ class PockResponseBuilder
      *
      * @param \Psr\Http\Message\StreamInterface|resource|string $stream
      *
-     * @return $this
+     * @return self
      */
-    public function withBody($stream): PockResponseBuilder
+    public function withBody($stream): self
     {
         if (is_string($stream)) {
             $stream = $this->factory->createStream($stream);
@@ -81,6 +147,33 @@ class PockResponseBuilder
 
         if (is_resource($stream)) {
             $stream = $this->factory->createStreamFromResource($stream);
+        }
+
+        if ($stream->isSeekable()) {
+            $stream->seek(0);
+        }
+
+        $this->response = $this->response->withBody($stream);
+
+        return $this;
+    }
+
+    /**
+     * Reply with data from specified file.
+     * For available modes @see \fopen()
+     *
+     * @param string $path
+     * @param string $mode
+     *
+     * @return self
+     * @throws InvalidArgumentException|RuntimeException
+     */
+    public function withFile(string $path, string $mode = 'r'): self
+    {
+        $stream = $this->factory->createStreamFromFile($path, $mode);
+
+        if ($stream->isSeekable()) {
+            $stream->seek(0);
         }
 
         $this->response = $this->response->withBody($stream);
@@ -91,10 +184,10 @@ class PockResponseBuilder
     /**
      * @param mixed $data
      *
-     * @return $this
+     * @return self
      * @throws \Pock\Exception\JsonException
      */
-    public function withJson($data): PockResponseBuilder
+    public function withJson($data): self
     {
         if (is_string($data) || is_numeric($data)) {
             return $this->withBody((string) $data);
@@ -118,10 +211,10 @@ class PockResponseBuilder
     /**
      * @param mixed $data
      *
-     * @return $this
-     * @throws \Pock\Exception\JsonException
+     * @return self
+     * @throws \Pock\Exception\XmlException
      */
-    public function withXml($data): PockResponseBuilder
+    public function withXml($data): self
     {
         if (is_string($data)) {
             return $this->withBody($data);
@@ -150,7 +243,7 @@ class PockResponseBuilder
      * @return string
      * @throws \Pock\Exception\JsonException
      */
-    private static function jsonEncode($data): string
+    protected static function jsonEncode($data): string
     {
         $data = json_encode($data);
 
@@ -167,7 +260,7 @@ class PockResponseBuilder
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    private static function jsonSerializer(): SerializerInterface
+    protected static function jsonSerializer(): SerializerInterface
     {
         if (null !== static::$jsonSerializer) {
             return static::$jsonSerializer;
@@ -186,11 +279,11 @@ class PockResponseBuilder
 
     /**
      * @return \Pock\Serializer\SerializerInterface
-     * @throws \Pock\Exception\JsonException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws \Pock\Exception\XmlException
      */
-    private static function xmlSerializer(): SerializerInterface
+    protected static function xmlSerializer(): SerializerInterface
     {
         if (null !== static::$xmlSerializer) {
             return static::$xmlSerializer;
@@ -199,7 +292,7 @@ class PockResponseBuilder
         $serializer = XmlSerializerFactory::create();
 
         if (null === $serializer) {
-            throw new JsonException('No XML serializer available');
+            throw new XmlException('No XML serializer available');
         }
 
         static::$xmlSerializer = $serializer;

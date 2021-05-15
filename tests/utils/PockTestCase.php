@@ -3,11 +3,11 @@
 /**
  * PHP 7.2
  *
- * @category AbstractRequestMatcherTest
- * @package  Pock\Tests\Matchers
+ * @category PockTestCase
+ * @package  Pock\TestUtils
  */
 
-namespace Pock\Tests\Matchers;
+namespace Pock\TestUtils;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -16,12 +16,12 @@ use Pock\Enum\RequestScheme;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * Class AbstractRequestMatcherTest
+ * Class PockTestCase
  *
- * @category AbstractRequestMatcherTest
- * @package  Pock\Tests\Matchers
+ * @category PockTestCase
+ * @package  Pock\TestUtils
  */
-abstract class AbstractRequestMatcherTest extends TestCase
+abstract class PockTestCase extends TestCase
 {
     protected const TEST_METHOD = RequestMethod::GET;
     protected const TEST_SCHEME = RequestScheme::HTTPS;

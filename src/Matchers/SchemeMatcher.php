@@ -30,7 +30,7 @@ class SchemeMatcher implements RequestMatcherInterface
      */
     public function __construct(string $scheme = RequestScheme::HTTP)
     {
-        $this->scheme = $scheme;
+        $this->scheme = strtolower($scheme);
     }
 
     /**
@@ -38,6 +38,6 @@ class SchemeMatcher implements RequestMatcherInterface
      */
     public function matches(RequestInterface $request): bool
     {
-        return strtolower($request->getUri()->getScheme()) === strtolower($this->scheme);
+        return strtolower($request->getUri()->getScheme()) === $this->scheme;
     }
 }
