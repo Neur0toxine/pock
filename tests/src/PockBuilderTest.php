@@ -15,6 +15,7 @@ use Pock\Exception\UniversalMockException;
 use Pock\Exception\UnsupportedRequestException;
 use Pock\PockBuilder;
 use Pock\TestUtils\PockTestCase;
+use Pock\TestUtils\SimpleObject;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use RuntimeException;
@@ -244,6 +245,31 @@ class PockBuilderTest extends PockTestCase
         self::assertEquals(['error' => 'Forbidden'], json_decode($response->getBody()->getContents(), true));
     }
 
+    public function testJsonObjectArrayResponse(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->reply(403)
+            ->withHeader('Content-Type', 'application/json')
+            ->withJson([
+                new SimpleObject(),
+                new SimpleObject()
+            ]);
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+        );
+
+        self::assertEquals(403, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['application/json']], $response->getHeaders());
+        self::assertEquals([
+            ['field' => 'test'],
+            ['field' => 'test']
+        ], json_decode($response->getBody()->getContents(), true));
+    }
+
     public function testXmlResponse(): void
     {
         $xml = <<<'EOF'
@@ -270,6 +296,82 @@ EOF;
         self::assertEquals(403, $response->getStatusCode());
         self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
         self::assertEquals($xml, $response->getBody()->getContents());
+    }
+
+    public function testFirstExampleApiMock(): void
+    {
+        $data = [
+            [
+                'name' => 'John Doe',
+                'username' => 'john',
+                'email' => 'john@example.com'
+            ],
+            [
+                'name' => 'Jane Doe',
+                'username' => 'jane',
+                'email' => 'jane@example.com'
+            ],
+        ];
+        $builder = new PockBuilder();
+
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost('example.com')
+            ->matchPath('/api/v1/users')
+            ->matchHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+            ])
+            ->reply(200)
+            ->withHeader('Content-Type', 'application/json')
+            ->withJson($data);
+
+        $request = self::getPsr17Factory()
+            ->createRequest(RequestMethod::GET, 'https://example.com/api/v1/users')
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Authorization', 'Basic YWxhZGRpbjpvcGVuc2VzYW1l');
+        $response = $builder->getClient()->sendRequest($request);
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertEquals(json_encode($data), $response->getBody()->getContents());
+    }
+
+    public function testSecondExampleApiMock(): void
+    {
+        $data = [
+            [
+                'name' => 'John Doe',
+                'username' => 'john',
+                'email' => 'john@example.com'
+            ],
+            [
+                'name' => 'Jane Doe',
+                'username' => 'jane',
+                'email' => 'jane@example.com'
+            ],
+        ];
+        $builder = new PockBuilder();
+
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri('https://example.com/api/v1/users')
+            ->matchHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+            ])
+            ->reply(200)
+            ->withHeader('Content-Type', 'application/json')
+            ->withJson($data);
+
+        $request = self::getPsr17Factory()
+            ->createRequest(RequestMethod::GET, 'https://example.com/api/v1/users')
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Authorization', 'Basic YWxhZGRpbjpvcGVuc2VzYW1l');
+        $response = $builder->getClient()->sendRequest($request);
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals('application/json', $response->getHeaderLine('Content-Type'));
+        self::assertEquals(json_encode($data), $response->getBody()->getContents());
     }
 
     public function testSeveralMocks(): void

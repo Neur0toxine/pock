@@ -5,7 +5,7 @@
         xmlns="https://www.phpdoc.org"
         xsi:noNamespaceSchemaLocation="https://docs.phpdoc.org/latest/phpdoc.xsd"
 >
-    <title>RetailCRM API Client</title>
+    <title>pock</title>
     <paths>
         <output>docs/build/html</output>
         <cache>docs/build/cache</cache>

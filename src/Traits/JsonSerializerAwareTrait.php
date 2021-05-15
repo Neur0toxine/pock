@@ -13,6 +13,7 @@ use JsonSerializable;
 use Pock\Exception\JsonException;
 use Pock\Factory\JsonSerializerFactory;
 use Pock\Serializer\SerializerInterface;
+use Throwable;
 
 /**
  * Trait JsonSerializerAwareTrait
@@ -43,7 +44,11 @@ trait JsonSerializerAwareTrait
         }
 
         if (is_array($data)) {
-            return static::jsonEncode($data);
+            try {
+                return static::jsonSerializer()->serialize($data);
+            } catch (Throwable $throwable) {
+                return static::jsonEncode($data);
+            }
         }
 
         if (is_object($data)) {
