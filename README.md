@@ -1,7 +1,8 @@
-[![Build Status](https://github.com/Neur0toxine/pock/workflows/Tests/badge.svg)](https://github.com/Neur0toxine/pock/actions)
-[![Coverage](https://img.shields.io/codecov/c/gh/Neur0toxine/pock/master.svg?logo=codecov&logoColor=white)](https://codecov.io/gh/Neur0toxine/pock)
-[![Latest stable](https://img.shields.io/packagist/v/neur0toxine/pock.svg)](https://packagist.org/packages/neur0toxine/pock)
-[![PHP from Packagist](https://img.shields.io/packagist/php-v/neur0toxine/pock.svg?logo=php&logoColor=white)](https://packagist.org/packages/neur0toxine/pock)
+![Build Status](https://img.shields.io/github/workflow/status/Neur0toxine/pock/Tests?style=flat-square)
+[![Coverage](https://img.shields.io/codecov/c/gh/Neur0toxine/pock/master.svg?logo=codecov&logoColor=white&style=flat-square)](https://codecov.io/gh/Neur0toxine/pock)
+[![Latest stable](https://img.shields.io/packagist/v/neur0toxine/pock.svg?style=flat-square)](https://packagist.org/packages/neur0toxine/pock)
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/neur0toxine/pock.svg?logo=php&logoColor=white&style=flat-square)](https://packagist.org/packages/neur0toxine/pock)
+![License](https://img.shields.io/github/license/Neur0toxine/pock?style=flat-square)
 
 # pock
 
