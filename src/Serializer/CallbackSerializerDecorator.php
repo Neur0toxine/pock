@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP 7.3
+ * PHP 7.1
  *
  * @category CallbackSerializerDecorator
  * @package  Pock\Serializer

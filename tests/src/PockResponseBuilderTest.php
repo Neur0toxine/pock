@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP 7.3
+ * PHP 7.1
  *
  * @category PockResponseBuilderTest
  * @package  Pock\Tests
@@ -157,7 +157,7 @@ class PockResponseBuilderTest extends PockTestCase
         return [
             [1, '1'],
             ['{}', '{}'],
-            [['key' => 'value'], '{"key":"value"}'],
+            [['key' => 'pattern'], '{"key":"pattern"}'],
             [new SimpleObjectJsonSerializable(), SimpleObjectJsonSerializable::JSON],
             [new SimpleObject(), SimpleObject::JSON]
         ];
@@ -176,8 +176,8 @@ class PockResponseBuilderTest extends PockTestCase
 EOF;
 
         return [
-            [SimpleObject::XML, SimpleObject::XML],
-            [new SimpleObject(), SimpleObject::XML],
+            [SimpleObject::JMS_XML, SimpleObject::JMS_XML],
+            [new SimpleObject(), SimpleObject::JMS_XML],
             [[new SimpleObject()], $xmlArray]
         ];
     }

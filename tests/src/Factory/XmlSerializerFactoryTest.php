@@ -27,6 +27,6 @@ class XmlSerializerFactoryTest extends TestCase
         $serializer = XmlSerializerFactory::create();
 
         self::assertInstanceOf(SerializerInterface::class, $serializer);
-        self::assertEquals(SimpleObject::XML, $serializer->serialize(new SimpleObject()));
+        self::assertEquals(SimpleObject::JMS_XML, $serializer->serialize(new SimpleObject()));
     }
 }

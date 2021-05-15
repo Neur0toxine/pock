@@ -10,6 +10,7 @@
 namespace Pock\Factory;
 
 use Pock\Creator\JmsJsonSerializerCreator;
+use Pock\Creator\SymfonyJsonSerializerCreator;
 use Pock\Serializer\SerializerInterface;
 
 /**
@@ -30,6 +31,7 @@ class JsonSerializerFactory extends AbstractSerializerFactory
     {
         return [
             JmsJsonSerializerCreator::class,
+            SymfonyJsonSerializerCreator::class
         ];
     }
 

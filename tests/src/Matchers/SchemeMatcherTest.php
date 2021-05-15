@@ -21,6 +21,11 @@ use Pock\TestUtils\PockTestCase;
  */
 class SchemeMatcherTest extends PockTestCase
 {
+    public function testNotMatches(): void
+    {
+        self::assertFalse((new SchemeMatcher(RequestScheme::HTTP))->matches(static::getTestRequest()));
+    }
+
     public function testMatches(): void
     {
         self::assertTrue((new SchemeMatcher(RequestScheme::HTTPS))->matches(static::getTestRequest()));

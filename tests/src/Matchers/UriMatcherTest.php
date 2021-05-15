@@ -22,6 +22,7 @@ class UriMatcherTest extends PockTestCase
 {
     public function testMatches(): void
     {
+        self::assertFalse((new UriMatcher('https://test.com'))->matches(static::getTestRequest()));
         self::assertTrue((new UriMatcher(self::TEST_URI))->matches(static::getTestRequest()));
         self::assertTrue((new UriMatcher(static::getPsr17Factory()->createUri(self::TEST_URI)))
             ->matches(static::getTestRequest()));

@@ -20,6 +20,11 @@ use Pock\TestUtils\PockTestCase;
  */
 class HostMatcherTest extends PockTestCase
 {
+    public function testNotMatches(): void
+    {
+        self::assertFalse((new HostMatcher('test.com'))->matches(static::getTestRequest()));
+    }
+
     public function testMatches(): void
     {
         self::assertTrue((new HostMatcher(self::TEST_HOST))->matches(static::getTestRequest()));

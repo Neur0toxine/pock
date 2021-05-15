@@ -32,11 +32,13 @@ abstract class PockTestCase extends TestCase
     protected static $psr17Factory;
 
     /**
+     * @param string|null $method
+     *
      * @return \Psr\Http\Message\RequestInterface
      */
-    protected static function getTestRequest(): RequestInterface
+    protected static function getTestRequest(?string $method = null): RequestInterface
     {
-        return static::getPsr17Factory()->createRequest(static::TEST_METHOD, static::TEST_URI);
+        return static::getPsr17Factory()->createRequest($method ?? static::TEST_METHOD, static::TEST_URI);
     }
 
     /**

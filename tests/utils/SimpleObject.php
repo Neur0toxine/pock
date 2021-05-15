@@ -20,13 +20,19 @@ use JMS\Serializer\Annotation as JMS;
 class SimpleObject
 {
     public const JSON = '{"field":"test"}';
-    public const XML = <<<'EOF'
+    public const JMS_XML = <<<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <result>
   <field><![CDATA[test]]></field>
 </result>
 
 EOF;
+    public const SYMFONY_XML = <<<'EOF'
+<?xml version="1.0"?>
+<response><field>test</field></response>
+
+EOF;
+
 
     /**
      * @var string
@@ -34,5 +40,5 @@ EOF;
      * @JMS\Type("string")
      * @JMS\SerializedName("field")
      */
-    protected $field = 'test';
+    public $field = 'test';
 }

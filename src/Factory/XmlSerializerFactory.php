@@ -10,6 +10,7 @@
 namespace Pock\Factory;
 
 use Pock\Creator\JmsXmlSerializerCreator;
+use Pock\Creator\SymfonyXmlSerializerCreator;
 use Pock\Serializer\SerializerInterface;
 
 /**
@@ -29,7 +30,8 @@ class XmlSerializerFactory extends AbstractSerializerFactory
     protected static function getCreators(): array
     {
         return [
-            JmsXmlSerializerCreator::class
+            JmsXmlSerializerCreator::class,
+            SymfonyXmlSerializerCreator::class
         ];
     }
 

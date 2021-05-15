@@ -87,6 +87,14 @@ class Mock implements MockInterface
      */
     public function getResponse(): ?ResponseInterface
     {
+        if (
+            null !== $this->response &&
+            null !== $this->response->getBody() &&
+            $this->response->getBody()->isSeekable()
+        ) {
+            $this->response->getBody()->seek(0);
+        }
+
         return $this->response;
     }
 
