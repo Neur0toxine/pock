@@ -44,7 +44,7 @@ class QueryMatcher extends AbstractArrayPoweredComponent implements RequestMatch
             return false;
         }
 
-        return self::isNeedlePresentInHaystack($this->query, $query);
+        return self::recursiveNeedlePresentInHaystack($this->query, $query);
     }
 
     /**

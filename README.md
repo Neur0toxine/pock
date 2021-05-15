@@ -88,7 +88,7 @@ pock supports JMS serializer and Symfony serializer out of the box. Available se
 It will be used to serialize requests and responses in mocks which means you actually can pass an entire DTO
 into the corresponding methods (for example, `matchJsonBody` as an assertion or `withJsonBody` to generate a response body).
 
-By default JMS serializer has more priority than the Symfony serializer. You can use methods below before running tests (`bootstrap.php`)
+By default, JMS serializer has more priority than the Symfony serializer. You can use methods below before running tests (`bootstrap.php`)
 if you want to override default behavior.
 
 ```php

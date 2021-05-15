@@ -280,17 +280,21 @@ class PockBuilderTest extends PockTestCase
 
 EOF;
 
-
         $builder = new PockBuilder();
         $builder->matchMethod(RequestMethod::GET)
             ->matchScheme(RequestScheme::HTTPS)
             ->matchHost(self::TEST_HOST)
+            ->matchXmlBody(new SimpleObject())
             ->reply(403)
             ->withHeader('Content-Type', 'text/xml')
             ->withXml(['error' => 'Forbidden']);
 
         $response = $builder->getClient()->sendRequest(
-            self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, self::TEST_URI)
+                ->withBody(self::getPsr17Factory()->createStream(
+                    self::getXmlSerializer()->serialize(new SimpleObject())
+                ))
         );
 
         self::assertEquals(403, $response->getStatusCode());

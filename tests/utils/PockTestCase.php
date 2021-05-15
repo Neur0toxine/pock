@@ -13,6 +13,9 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
+use Pock\Factory\JsonSerializerFactory;
+use Pock\Factory\XmlSerializerFactory;
+use Pock\Serializer\SerializerInterface;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -51,5 +54,15 @@ abstract class PockTestCase extends TestCase
         }
 
         return static::$psr17Factory;
+    }
+
+    protected static function getJsonSerializer(): SerializerInterface
+    {
+        return JsonSerializerFactory::create();
+    }
+
+    protected static function getXmlSerializer(): SerializerInterface
+    {
+        return XmlSerializerFactory::create();
     }
 }

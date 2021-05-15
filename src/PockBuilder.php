@@ -33,6 +33,7 @@ use Pock\Matchers\SchemeMatcher;
 use Pock\Matchers\UriMatcher;
 use Pock\Traits\JsonDecoderTrait;
 use Pock\Traits\JsonSerializerAwareTrait;
+use Pock\Traits\XmlSerializerAwareTrait;
 use Psr\Http\Client\ClientInterface;
 use Throwable;
 
@@ -49,6 +50,7 @@ class PockBuilder
 {
     use JsonDecoderTrait;
     use JsonSerializerAwareTrait;
+    use XmlSerializerAwareTrait;
 
     /** @var \Pock\Matchers\MultipleMatcher */
     private $matcher;
@@ -270,6 +272,23 @@ class PockBuilder
                 true
             )
         ));
+    }
+
+    /**
+     * Match XML request body.
+     *
+     * **Note:** this method will use string comparison for now. It'll be improved in future.
+     *
+     * @todo Don't use simple string comparison. Match the entire body by its DOM.
+     *
+     * @param mixed $data
+     *
+     * @return self
+     * @throws \Pock\Exception\XmlException
+     */
+    public function matchXmlBody($data): self
+    {
+        return $this->matchBody(self::serializeXml($data) ?? '');
     }
 
     /**
