@@ -3,6 +3,16 @@
     "description": "PSR-18 compatible HTTP mock library",
     "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/Neur0toxine/pock",
+    "keywords": [
+        "php-http",
+        "http",
+        "symfony",
+        "mock",
+        "psr-7",
+        "psr-18",
+        "mock"
+    ],
     "authors": [
         {
             "name": "Neur0toxine",
