@@ -10,6 +10,7 @@
 namespace Pock;
 
 use Pock\Matchers\RequestMatcherInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -36,11 +37,14 @@ interface MockInterface
     public function available(): bool;
 
     /**
-     * Returns matcher for the request.
+     * Returns true if underlying matcher has matched provided request.
+     * It also returns false if matcher has matched request but hits condition is not met yet.
      *
-     * @return \Pock\Matchers\RequestMatcherInterface
+     * @param \Psr\Http\Message\RequestInterface $request
+     *
+     * @return bool
      */
-    public function getMatcher(): RequestMatcherInterface;
+    public function matches(RequestInterface $request): bool;
 
     /**
      * Returns response which should be used as mock data.
@@ -52,7 +56,9 @@ interface MockInterface
     /**
      * Returns the throwable which will be thrown as mock data.
      *
+     * @param \Psr\Http\Message\RequestInterface $request This request may be set into exception if possible
+     *
      * @return \Throwable|null
      */
-    public function getThrowable(): ?Throwable;
+    public function getThrowable(RequestInterface $request): ?Throwable;
 }

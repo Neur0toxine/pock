@@ -9,7 +9,12 @@
 
 namespace Pock;
 
+use Pock\Exception\PockNetworkException;
+use Pock\Exception\PockRequestException;
 use Pock\Matchers\RequestMatcherInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -36,6 +41,9 @@ class Mock implements MockInterface
     /** @var int */
     private $maxHits;
 
+    /** @var int */
+    private $matchAt;
+
     /**
      * Mock constructor.
      *
@@ -43,18 +51,25 @@ class Mock implements MockInterface
      * @param \Psr\Http\Message\ResponseInterface|null $response
      * @param \Throwable|null                          $throwable
      * @param int                                      $maxHits
+     * @param int                                      $matchAt
      */
     public function __construct(
         RequestMatcherInterface $matcher,
         ?ResponseInterface $response,
         ?Throwable $throwable,
-        int $maxHits
+        int $maxHits,
+        int $matchAt
     ) {
         $this->matcher = $matcher;
         $this->response = $response;
         $this->throwable = $throwable;
+        $this->matchAt = $matchAt;
         $this->maxHits = $maxHits;
         $this->hits = 0;
+
+        if ($this->maxHits < ($matchAt + 1) && -1 !== $this->maxHits) {
+            $this->maxHits = $matchAt + 1;
+        }
     }
 
     /**
@@ -62,7 +77,10 @@ class Mock implements MockInterface
      */
     public function registerHit(): MockInterface
     {
-        ++$this->hits;
+        if (-1 !== $this->maxHits) {
+            ++$this->hits;
+        }
+
         return $this;
     }
 
@@ -71,15 +89,27 @@ class Mock implements MockInterface
      */
     public function available(): bool
     {
-        return $this->hits < $this->maxHits;
+        return -1 === $this->maxHits || $this->hits < $this->maxHits;
     }
 
     /**
      * @inheritDoc
      */
-    public function getMatcher(): RequestMatcherInterface
+    public function matches(RequestInterface $request): bool
     {
-        return $this->matcher;
+        if ($this->matcher->matches($request)) {
+            if ($this->matchAt <= 0) {
+                return true;
+            }
+
+            if ($this->matchAt === $this->hits) {
+                return true;
+            }
+
+            $this->registerHit();
+        }
+
+        return false;
     }
 
     /**
@@ -101,8 +131,12 @@ class Mock implements MockInterface
     /**
      * @inheritDoc
      */
-    public function getThrowable(): ?Throwable
+    public function getThrowable(RequestInterface $request): ?Throwable
     {
+        if ($this->throwable instanceof PockRequestException || $this->throwable instanceof PockNetworkException) {
+            return $this->throwable->setRequest($request);
+        }
+
         return $this->throwable;
     }
 }

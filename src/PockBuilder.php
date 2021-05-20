@@ -12,6 +12,9 @@ namespace Pock;
 use Diff\ArrayComparer\StrictArrayComparer;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
+use Pock\Exception\PockClientException;
+use Pock\Exception\PockNetworkException;
+use Pock\Exception\PockRequestException;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\BodyMatcher;
 use Pock\Matchers\CallbackRequestMatcher;
@@ -45,6 +48,7 @@ use Throwable;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class PockBuilder
 {
@@ -63,6 +67,9 @@ class PockBuilder
 
     /** @var int */
     private $maxHits;
+
+    /** @var int */
+    private $matchAt;
 
     /** @var \Pock\MockInterface[] */
     private $mocks;
@@ -329,9 +336,54 @@ class PockBuilder
      */
     public function repeat(int $hits): self
     {
+        $this->closePrevious();
+
         if ($hits > 0) {
             $this->maxHits = $hits;
         }
+
+        return $this;
+    }
+
+    /**
+     * Always execute this mock if matched. Mock with this call will not be expired ever.
+     *
+     * @return self
+     */
+    public function always(): self
+    {
+        $this->closePrevious();
+        $this->maxHits = -1;
+
+        return $this;
+    }
+
+    /**
+     * Match request only at Nth hit. Previous matches will not be executed.
+     *
+     * **Note:** There IS a catch if you use this with the equal mocks. The test Client will not register hit
+     * for the second mock and the second mock will be executed at N+1 time.
+     *
+     * For example, if you try to send 5 requests with this mocks and log response codes:
+     * ```php
+     * $builder = new PockBuilder();
+     *
+     * $builder->matchHost('example.com')->at(2)->reply(200);
+     * $builder->matchHost('example.com')->at(4)->reply(201);
+     * $builder->always()->reply(400);
+     * ```
+     *
+     * You will get this: 400, 400, 200, 400, 400, 201
+     * Instead of this: 400, 400, 200, 400, 201, 400
+     *
+     * @param int $hit
+     *
+     * @return self
+     */
+    public function at(int $hit): self
+    {
+        $this->closePrevious();
+        $this->matchAt = $hit - 1;
 
         return $this;
     }
@@ -348,6 +400,42 @@ class PockBuilder
         $this->throwable = $throwable;
 
         return $this;
+    }
+
+    /**
+     * Throw an ClientExceptionInterface instance with specified message
+     *
+     * @param string $message
+     *
+     * @return self
+     */
+    public function throwClientException(string $message = 'Pock ClientException'): self
+    {
+        return $this->throwException(new PockClientException($message));
+    }
+
+    /**
+     * Throw an NetworkExceptionInterface instance with specified message
+     *
+     * @param string $message
+     *
+     * @return self
+     */
+    public function throwNetworkException(string $message = 'Pock NetworkException'): self
+    {
+        return $this->throwException(new PockNetworkException($message));
+    }
+
+    /**
+     * Throw an RequestExceptionInterface instance with specified message
+     *
+     * @param string $message
+     *
+     * @return self
+     */
+    public function throwRequestException(string $message = 'Pock RequestException'): self
+    {
+        return $this->throwException(new PockRequestException($message));
     }
 
     /**
@@ -377,6 +465,7 @@ class PockBuilder
         $this->responseBuilder = null;
         $this->throwable = null;
         $this->maxHits = 1;
+        $this->matchAt = -1;
         $this->mocks = [];
 
         return $this;
@@ -421,12 +510,14 @@ class PockBuilder
                 $this->matcher,
                 $response,
                 $this->throwable,
-                $this->maxHits
+                $this->maxHits,
+                $this->matchAt
             );
             $this->matcher = new MultipleMatcher();
             $this->responseBuilder = null;
             $this->throwable = null;
             $this->maxHits = 1;
+            $this->matchAt = -1;
         }
     }
 }

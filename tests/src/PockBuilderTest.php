@@ -11,14 +11,14 @@ namespace Pock\Tests;
 
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
-use Pock\Exception\UniversalMockException;
 use Pock\Exception\UnsupportedRequestException;
 use Pock\PockBuilder;
 use Pock\TestUtils\PockTestCase;
 use Pock\TestUtils\SimpleObject;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestInterface;
-use RuntimeException;
 
 /**
  * Class PockBuilderTest
@@ -35,7 +35,7 @@ class PockBuilderTest extends PockTestCase
             ->createRequest(RequestMethod::GET, self::TEST_URI));
     }
 
-    public function testThrowException(): void
+    public function testThrowClientException(): void
     {
         $this->expectException(ClientExceptionInterface::class);
 
@@ -43,7 +43,37 @@ class PockBuilderTest extends PockTestCase
         $builder->matchMethod(RequestMethod::GET)
             ->matchScheme(RequestScheme::HTTPS)
             ->matchHost(self::TEST_HOST)
-            ->throwException(new UniversalMockException('Boom!'));
+            ->throwClientException();
+
+        $builder->getClient()->sendRequest(
+            self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+        );
+    }
+
+    public function testThrowNetworkException(): void
+    {
+        $this->expectException(NetworkExceptionInterface::class);
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->throwNetworkException();
+
+        $builder->getClient()->sendRequest(
+            self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+        );
+    }
+
+    public function testThrowRequestException(): void
+    {
+        $this->expectException(RequestExceptionInterface::class);
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->throwRequestException();
 
         $builder->getClient()->sendRequest(
             self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
@@ -510,5 +540,51 @@ EOF;
                 ->withBody(self::getPsr17Factory()->createStream('test data'))
         );
         self::assertEquals('Second token (post)', $response->getBody()->getContents());
+    }
+
+    public function testAlways(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->always()
+            ->reply(200)
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody('Successful');
+
+        for ($i = 0; $i < 10; $i++) {
+            $response = $builder->getClient()->sendRequest(
+                self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+            );
+
+            self::assertEquals(200, $response->getStatusCode());
+            self::assertEquals(['Content-Type' => ['text/plain']], $response->getHeaders());
+            self::assertEquals('Successful', $response->getBody()->getContents());
+        }
+    }
+
+    public function testAt(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->at(2)
+            ->reply(200);
+
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->at(4)
+            ->reply(201);
+
+        $builder->always()->reply(400);
+        $builder->getClient();
+
+        for ($i = 0; $i < 5; $i++) {
+            $response = $builder->getClient()->sendRequest(
+                self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+            );
+
+            self::assertEquals(1 === $i ? 200 : (4 === $i ? 201 : 400), $response->getStatusCode());
+        }
     }
 }

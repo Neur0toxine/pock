@@ -74,17 +74,19 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
                 continue;
             }
 
-            if ($mock->getMatcher()->matches($request)) {
+            if ($mock->matches($request)) {
                 if (null !== $mock->getResponse()) {
                     $mock->registerHit();
 
                     return new HttpFulfilledPromise($mock->getResponse());
                 }
 
-                if (null !== $mock->getThrowable()) {
+                $throwable = $mock->getThrowable($request);
+
+                if (null !== $throwable) {
                     $mock->registerHit();
 
-                    return new HttpRejectedPromise($mock->getThrowable());
+                    return new HttpRejectedPromise($throwable);
                 }
 
                 throw new IncompleteMockException($mock);

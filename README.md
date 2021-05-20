@@ -112,12 +112,11 @@ In order to use unsupported serializer you should create a decorator which imple
 
 # Roadmap to stable
 
-- [ ] `at(N)` - execute mock only at Nth call.  
-- [ ] `after(N)` - allow mock execution only after Nth call (for using with repeat or always).  
-- [ ] `always()` - always execute this mock (removes mock expiration).  
+- [x] `at(N)` - execute mock only at Nth call.
+- [x] `always()` - always execute this mock (removes mock expiration).  
 - [ ] Regexp matchers for body, query and path.  
-- [ ] Separate `UniversalMockException` into several exceptions (`PockClientException`, `PockNetworkException`, etc).  
-- [ ] Add methods for easier throwing of exceptions listed in previous entry.  
+- [x] Separate `UniversalMockException` into several exceptions (`PockClientException`, `PockNetworkException`, etc).  
+- [x] Add methods for easier throwing of exceptions listed in previous entry.  
 - [ ] `replyCallback` - reply using specified callback.  
 - [ ] `replyFactory` - reply using specified response factory (provide corresponding interface).  
 - [ ] Compare XML bodies using `DOMDocument`, fallback to text comparison in case of problems.  
