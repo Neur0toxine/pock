@@ -115,13 +115,13 @@ In order to use unsupported serializer you should create a decorator which imple
 
 # Roadmap to stable
 
-- [x] `at(N)` - execute mock only at Nth call.
+- [x] `at(N)` - execute mock only at Nth call.  
 - [x] `always()` - always execute this mock (removes mock expiration).  
-- [ ] Regexp matchers for body, query and path.  
 - [x] Separate `UniversalMockException` into several exceptions (`PockClientException`, `PockNetworkException`, etc).  
 - [x] Add methods for easier throwing of exceptions listed in previous entry.  
 - [x] `replyWithCallback` - reply using specified callback.  
 - [x] `replyWithFactory` - reply using specified response factory (provide corresponding interface).  
-- [ ] `symfony/http-client` support.  
 - [x] Compare XML bodies using `DOMDocument`, fallback to text comparison in case of problems.  
+- [ ] Regexp matchers for body, query and path.  
+- [ ] `symfony/http-client` support.  
 - [ ] Document everything (with examples if it’s feasible).
