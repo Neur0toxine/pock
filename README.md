@@ -122,5 +122,6 @@ In order to use unsupported serializer you should create a decorator which imple
 - [x] Add methods for easier throwing of exceptions listed in previous entry.  
 - [x] `replyWithCallback` - reply using specified callback.  
 - [x] `replyWithFactory` - reply using specified response factory (provide corresponding interface).  
+- [ ] `symfony/http-client` support.  
 - [ ] Compare XML bodies using `DOMDocument`, fallback to text comparison in case of problems.  
 - [ ] Document everything (with examples if it’s feasible).
