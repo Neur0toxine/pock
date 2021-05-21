@@ -47,7 +47,8 @@
         "jms/serializer": "^2 | ^3.12",
         "symfony/phpunit-bridge": "^5.2",
         "symfony/serializer": "^5.2",
-        "symfony/property-access": "^5.2"
+        "symfony/property-access": "^5.2",
+        "php-mock/php-mock": "^2.3"
     },
     "provide": {
         "psr/http-client-implementation": "1.0",

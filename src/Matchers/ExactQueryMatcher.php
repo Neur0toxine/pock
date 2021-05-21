@@ -9,6 +9,8 @@
 
 namespace Pock\Matchers;
 
+use Pock\Comparator\ComparatorLocator;
+use Pock\Comparator\RecursiveArrayComparator;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -30,6 +32,6 @@ class ExactQueryMatcher extends QueryMatcher
             return false;
         }
 
-        return self::recursiveCompareArrays($this->query, $query);
+        return ComparatorLocator::get(RecursiveArrayComparator::class)->compare($this->query, $query);
     }
 }

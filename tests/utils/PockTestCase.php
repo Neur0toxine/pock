@@ -45,6 +45,19 @@ abstract class PockTestCase extends TestCase
     }
 
     /**
+     * @param string $body
+     *
+     * @return \Psr\Http\Message\RequestInterface
+     */
+    protected static function getRequestWithBody(string $body): RequestInterface
+    {
+        return static::getPsr17Factory()->createRequest(
+            RequestMethod::GET,
+            static::TEST_URI
+        )->withBody(self::getPsr17Factory()->createStream($body));
+    }
+
+    /**
      * @return \Nyholm\Psr7\Factory\Psr17Factory
      */
     protected static function getPsr17Factory(): Psr17Factory

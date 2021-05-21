@@ -9,6 +9,8 @@
 
 namespace Pock\Matchers;
 
+use Pock\Comparator\ComparatorLocator;
+use Pock\Comparator\ScalarFlatArrayComparator;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -28,6 +30,7 @@ class ExactHeaderMatcher extends HeaderMatcher
             return false;
         }
 
-        return self::compareStringArrays($request->getHeader($this->header), $this->value);
+        return ComparatorLocator::get(ScalarFlatArrayComparator::class)
+            ->compare($request->getHeader($this->header), $this->value);
     }
 }

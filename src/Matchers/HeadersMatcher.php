@@ -9,6 +9,8 @@
 
 namespace Pock\Matchers;
 
+use Pock\Comparator\ComparatorLocator;
+use Pock\Comparator\LtrScalarArrayComparator;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -17,7 +19,7 @@ use Psr\Http\Message\RequestInterface;
  * @category HeadersMatcher
  * @package  Pock\Matchers
  */
-class HeadersMatcher extends AbstractArrayPoweredComponent implements RequestMatcherInterface
+class HeadersMatcher implements RequestMatcherInterface
 {
     /** @var array<string, string|string[]> */
     protected $headers;
@@ -48,7 +50,7 @@ class HeadersMatcher extends AbstractArrayPoweredComponent implements RequestMat
                 $value = [$value];
             }
 
-            if (!static::isNeedlePresentInHaystack($value, $request->getHeader($name))) {
+            if (!ComparatorLocator::get(LtrScalarArrayComparator::class)->compare($value, $request->getHeader($name))) {
                 return false;
             }
         }

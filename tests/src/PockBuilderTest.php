@@ -9,10 +9,11 @@
 
 namespace Pock\Tests;
 
+use DOMDocument;
+use phpmock\MockBuilder;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Exception\UnsupportedRequestException;
-use Pock\Factory\ReplyFactoryInterface;
 use Pock\PockBuilder;
 use Pock\PockResponseBuilder;
 use Pock\TestUtils\PockTestCase;
@@ -22,7 +23,6 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
 /**
@@ -83,6 +83,23 @@ class PockBuilderTest extends PockTestCase
         $builder->getClient()->sendRequest(
             self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
         );
+    }
+
+    public function testThrowRequestExceptionGetRequest(): void
+    {
+        $builder = new PockBuilder();
+        $request = self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI);
+
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->throwRequestException();
+
+        try {
+            $builder->getClient()->sendRequest($request);
+        } catch (RequestExceptionInterface $exception) {
+            self::assertEquals($request, $exception->getRequest());
+        }
     }
 
     public function testMatchHeader(): void
@@ -305,7 +322,124 @@ class PockBuilderTest extends PockTestCase
         ], json_decode($response->getBody()->getContents(), true));
     }
 
-    public function testXmlResponse(): void
+    public function testMatchXmlString(): void
+    {
+        $xml = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <entry><![CDATA[Forbidden]]></entry>
+</result>
+
+EOF;
+        $simpleObject = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <field><![CDATA[test]]></field>
+</result>
+EOF;
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->matchXmlBody($simpleObject)
+            ->repeat(2)
+            ->reply(403)
+            ->withHeader('Content-Type', 'text/xml')
+            ->withXml(['error' => 'Forbidden']);
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, self::TEST_URI)
+                ->withBody(self::getPsr17Factory()->createStream($simpleObject))
+        );
+
+        self::assertEquals(403, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
+        self::assertEquals($xml, $response->getBody()->getContents());
+    }
+
+    public function testMatchXmlStream(): void
+    {
+        $xml = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <entry><![CDATA[Forbidden]]></entry>
+</result>
+
+EOF;
+        $simpleObject = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <field><![CDATA[test]]></field>
+</result>
+EOF;
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->matchXmlBody(self::getPsr17Factory()->createStream($simpleObject))
+            ->repeat(2)
+            ->reply(403)
+            ->withHeader('Content-Type', 'text/xml')
+            ->withXml(['error' => 'Forbidden']);
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, self::TEST_URI)
+                ->withBody(self::getPsr17Factory()->createStream($simpleObject))
+        );
+
+        self::assertEquals(403, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
+        self::assertEquals($xml, $response->getBody()->getContents());
+    }
+
+    public function testMatchXmlDOMDocument(): void
+    {
+        $xml = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <entry><![CDATA[Forbidden]]></entry>
+</result>
+
+EOF;
+        $simpleObject = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <field><![CDATA[test]]></field>
+</result>
+EOF;
+
+        $document = new DOMDocument();
+        $document->loadXML($simpleObject);
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->matchXmlBody($document)
+            ->repeat(2)
+            ->reply(403)
+            ->withHeader('Content-Type', 'text/xml')
+            ->withXml(['error' => 'Forbidden']);
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, self::TEST_URI)
+                ->withBody(self::getPsr17Factory()->createStream($simpleObject))
+        );
+
+        self::assertEquals(403, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
+        self::assertEquals($xml, $response->getBody()->getContents());
+    }
+
+    /**
+     * @dataProvider matchXmlNoXslProvider
+     */
+    public function testMatchXmlNoXsl(string $simpleObject, bool $expectException): void
     {
         $xml = <<<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -315,11 +449,77 @@ class PockBuilderTest extends PockTestCase
 
 EOF;
 
+        if ($expectException) {
+            $this->expectException(UnsupportedRequestException::class);
+        }
+
+        $mock = (new MockBuilder())->setNamespace('Pock\Matchers')
+            ->setName('extension_loaded')
+            ->setFunction(
+                static function (string $extension) {
+                    if ('xsl' === $extension) {
+                        return false;
+                    }
+
+                    return \extension_loaded($extension);
+                }
+            )->build();
+        $mock->enable();
+
+        $document = new DOMDocument();
+        $document->loadXML($simpleObject);
+
         $builder = new PockBuilder();
         $builder->matchMethod(RequestMethod::GET)
             ->matchScheme(RequestScheme::HTTPS)
             ->matchHost(self::TEST_HOST)
-            ->matchXmlBody(new SimpleObject())
+            ->matchXmlBody($document)
+            ->repeat(2)
+            ->reply(403)
+            ->withHeader('Content-Type', 'text/xml')
+            ->withXml(['error' => 'Forbidden']);
+
+        $mock->disable();
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, self::TEST_URI)
+                ->withBody(self::getPsr17Factory()->createStream($simpleObject))
+        );
+
+        self::assertEquals(403, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
+        self::assertEquals($xml, $response->getBody()->getContents());
+    }
+
+    public function testSerializedXmlResponse(): void
+    {
+        $xml = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <entry><![CDATA[Forbidden]]></entry>
+</result>
+
+EOF;
+        $simpleObjectFreeFormXml = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+
+<result>
+
+  <field>
+    <![CDATA[test]]>
+    
+    </field>
+  
+</result>
+EOF;
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->matchSerializedXmlBody(new SimpleObject())
+            ->repeat(2)
             ->reply(403)
             ->withHeader('Content-Type', 'text/xml')
             ->withXml(['error' => 'Forbidden']);
@@ -328,8 +528,18 @@ EOF;
             self::getPsr17Factory()
                 ->createRequest(RequestMethod::GET, self::TEST_URI)
                 ->withBody(self::getPsr17Factory()->createStream(
-                    self::getXmlSerializer()->serialize(new SimpleObject())
+                    PHP_EOL . self::getXmlSerializer()->serialize(new SimpleObject()) . PHP_EOL
                 ))
+        );
+
+        self::assertEquals(403, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
+        self::assertEquals($xml, $response->getBody()->getContents());
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, self::TEST_URI)
+                ->withBody(self::getPsr17Factory()->createStream($simpleObjectFreeFormXml))
         );
 
         self::assertEquals(403, $response->getStatusCode());
@@ -648,5 +858,19 @@ EOF;
              RequestMethod::GET,
              self::TEST_URI
          ));
+    }
+
+    public function matchXmlNoXslProvider(): array
+    {
+        $simpleObject = <<<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <field><![CDATA[test]]></field>
+</result>
+EOF;
+        return [
+            [$simpleObject, true],
+            [$simpleObject . "\n", false]
+        ];
     }
 }

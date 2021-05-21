@@ -9,8 +9,9 @@
 
 namespace Pock\Matchers;
 
+use Pock\Comparator\ComparatorLocator;
+use Pock\Comparator\RecursiveLtrArrayComparator;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 
 /**
  * Class QueryMatcher
@@ -18,7 +19,7 @@ use Psr\Http\Message\UriInterface;
  * @category QueryMatcher
  * @package  Pock\Matchers
  */
-class QueryMatcher extends AbstractArrayPoweredComponent implements RequestMatcherInterface
+class QueryMatcher implements RequestMatcherInterface
 {
     /** @var array<string, mixed> */
     protected $query;
@@ -44,7 +45,7 @@ class QueryMatcher extends AbstractArrayPoweredComponent implements RequestMatch
             return false;
         }
 
-        return self::recursiveNeedlePresentInHaystack($this->query, $query);
+        return ComparatorLocator::get(RecursiveLtrArrayComparator::class)->compare($this->query, $query);
     }
 
     /**

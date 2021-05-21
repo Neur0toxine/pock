@@ -9,6 +9,8 @@
 
 namespace Pock\Matchers;
 
+use Pock\Comparator\ComparatorLocator;
+use Pock\Comparator\RecursiveArrayComparator;
 use Pock\Traits\SeekableStreamDataExtractor;
 use Psr\Http\Message\RequestInterface;
 
@@ -18,7 +20,7 @@ use Psr\Http\Message\RequestInterface;
  * @category AbstractSerializedBodyMatcher
  * @package  Pock\Matchers
  */
-abstract class AbstractSerializedBodyMatcher extends AbstractArrayPoweredComponent implements RequestMatcherInterface
+abstract class AbstractSerializedBodyMatcher implements RequestMatcherInterface
 {
     use SeekableStreamDataExtractor;
 
@@ -54,7 +56,7 @@ abstract class AbstractSerializedBodyMatcher extends AbstractArrayPoweredCompone
             return false;
         }
 
-        return self::recursiveCompareArrays($bodyData, $this->data);
+        return ComparatorLocator::get(RecursiveArrayComparator::class)->compare($bodyData, $this->data);
     }
 
     /**

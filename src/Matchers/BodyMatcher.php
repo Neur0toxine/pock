@@ -33,17 +33,7 @@ class BodyMatcher implements RequestMatcherInterface
      */
     public function __construct($contents)
     {
-        if (is_string($contents)) {
-            $this->contents = $contents;
-        }
-
-        if ($contents instanceof StreamInterface) {
-            $this->contents = static::getStreamData($contents);
-        }
-
-        if (is_resource($contents)) {
-            $this->contents = static::readAllResource($contents);
-        }
+        $this->contents = static::getEntryItemData($contents);
     }
 
     /**
@@ -69,5 +59,25 @@ class BodyMatcher implements RequestMatcherInterface
     {
         fseek($resource, 0);
         return (string) stream_get_contents($resource);
+    }
+
+    /**
+     * @param StreamInterface|resource|string $contents
+     *
+     * @return string
+     */
+    protected static function getEntryItemData($contents): string
+    {
+        if (is_string($contents)) {
+            return $contents;
+        }
+
+        if ($contents instanceof StreamInterface) {
+            return static::getStreamData($contents);
+        }
+
+        if (is_resource($contents)) {
+            return static::readAllResource($contents);
+        }
     }
 }

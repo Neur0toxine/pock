@@ -10,11 +10,13 @@
 namespace Pock;
 
 use Diff\ArrayComparer\StrictArrayComparer;
+use DOMDocument;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Exception\PockClientException;
 use Pock\Exception\PockNetworkException;
 use Pock\Exception\PockRequestException;
+use Pock\Exception\XmlException;
 use Pock\Factory\CallbackReplyFactory;
 use Pock\Factory\ReplyFactoryInterface;
 use Pock\Matchers\AnyRequestMatcher;
@@ -36,6 +38,7 @@ use Pock\Matchers\QueryMatcher;
 use Pock\Matchers\RequestMatcherInterface;
 use Pock\Matchers\SchemeMatcher;
 use Pock\Matchers\UriMatcher;
+use Pock\Matchers\XmlBodyMatcher;
 use Pock\Traits\JsonDecoderTrait;
 use Pock\Traits\JsonSerializerAwareTrait;
 use Pock\Traits\XmlSerializerAwareTrait;
@@ -287,20 +290,37 @@ class PockBuilder
     }
 
     /**
+     * Match XML request body using raw XML data.
+     *
+     * **Note:** this method will fallback to the string comparison if ext-xsl is not available.
+     * It also doesn't serializer values with available XML serializer.
+     * Use PockBuilder::matchSerializedXmlBody if you want to execute available serializer.
+     *
+     * @see \Pock\PockBuilder::matchSerializedXmlBody()
+     *
+     * @param DOMDocument|\Psr\Http\Message\StreamInterface|resource|string $data
+     *
+     * @return self
+     */
+    public function matchXmlBody($data): self
+    {
+        return $this->addMatcher(new XmlBodyMatcher($data));
+    }
+
+    /**
      * Match XML request body.
      *
-     * **Note:** this method will use string comparison for now. It'll be improved in future.
+     * This method will try to use available XML serializer before matching.
      *
-     * @todo Don't use simple string comparison. Match the entire body by its DOM.
-     *
-     * @param mixed $data
+     * @phpstan-ignore-next-line
+     * @param string|array|object $data
      *
      * @return self
      * @throws \Pock\Exception\XmlException
      */
-    public function matchXmlBody($data): self
+    public function matchSerializedXmlBody($data): self
     {
-        return $this->matchBody(self::serializeXml($data) ?? '');
+        return $this->matchXmlBody(self::serializeXml($data) ?? '');
     }
 
     /**
