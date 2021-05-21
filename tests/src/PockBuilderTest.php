@@ -10,12 +10,10 @@
 namespace Pock\Tests;
 
 use DOMDocument;
-use phpmock\Mock;
-use phpmock\MockBuilder;
-use phpmock\MockRegistry;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Exception\UnsupportedRequestException;
+use Pock\Matchers\XmlBodyMatcher;
 use Pock\PockBuilder;
 use Pock\PockResponseBuilder;
 use Pock\TestUtils\PockTestCase;
@@ -35,9 +33,9 @@ use RuntimeException;
  */
 class PockBuilderTest extends PockTestCase
 {
-    protected function tearDown(): void
+    protected function setUp(): void
     {
-        uopz_unset_return('extension_loaded');
+        XmlBodyMatcher::$forceTextComparison = false;
     }
 
     public function testNoHit(): void
@@ -463,17 +461,7 @@ EOF;
         $document = new DOMDocument();
         $document->loadXML($simpleObject);
 
-        uopz_set_return(
-            'extension_loaded',
-            function (string $extension) {
-                if ('xsl' === $extension) {
-                    return false;
-                }
-
-                return true;
-            },
-            true
-        );
+        XmlBodyMatcher::$forceTextComparison = true;
 
         $builder = new PockBuilder();
         $builder->matchMethod(RequestMethod::GET)

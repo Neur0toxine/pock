@@ -44,6 +44,9 @@ class XmlBodyMatcher extends BodyMatcher
 </xsl:stylesheet>
 EOT;
 
+    /** @var bool */
+    public static $forceTextComparison = false;
+
     /** @var XSLTProcessor|null */
     private static $sorter;
 
@@ -59,14 +62,14 @@ EOT;
      */
     public function __construct($referenceXml)
     {
-        if (!extension_loaded('xsl') || !extension_loaded('dom')) {
+        if (!static::hasExtension('xsl') || !static::hasExtension('dom')) {
             $this->useFallback = true;
         }
 
-        if (!extension_loaded('xsl')) {
+        if (!static::hasExtension('xsl')) {
             $this->useFallback = true;
 
-            if (extension_loaded('dom') && $referenceXml instanceof DOMDocument) {
+            if (static::hasExtension('dom') && $referenceXml instanceof DOMDocument) {
                 $referenceXml = static::getDOMString($referenceXml);
             }
 
@@ -189,5 +192,19 @@ EOT;
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $extension
+     *
+     * @return bool
+     */
+    private static function hasExtension(string $extension): bool
+    {
+        if (static::$forceTextComparison && 'xsl' === $extension) {
+            return false;
+        }
+
+        return extension_loaded($extension);
     }
 }
