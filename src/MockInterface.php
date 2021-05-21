@@ -9,6 +9,7 @@
 
 namespace Pock;
 
+use Pock\Factory\ReplyFactoryInterface;
 use Pock\Matchers\RequestMatcherInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -52,6 +53,13 @@ interface MockInterface
      * @return \Psr\Http\Message\ResponseInterface|null
      */
     public function getResponse(): ?ResponseInterface;
+
+    /**
+     * Returns reply factory which should be used to form the mocked response.
+     *
+     * @return \Pock\Factory\ReplyFactoryInterface|null
+     */
+    public function getReplyFactory(): ?ReplyFactoryInterface;
 
     /**
      * Returns the throwable which will be thrown as mock data.

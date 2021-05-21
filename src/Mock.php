@@ -11,6 +11,7 @@ namespace Pock;
 
 use Pock\Exception\PockNetworkException;
 use Pock\Exception\PockRequestException;
+use Pock\Factory\ReplyFactoryInterface;
 use Pock\Matchers\RequestMatcherInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
@@ -28,6 +29,9 @@ class Mock implements MockInterface
 {
     /** @var \Pock\Matchers\RequestMatcherInterface */
     private $matcher;
+
+    /** @var \Pock\Factory\ReplyFactoryInterface|null */
+    private $replyFactory;
 
     /** @var \Psr\Http\Message\ResponseInterface|null */
     private $response;
@@ -48,6 +52,7 @@ class Mock implements MockInterface
      * Mock constructor.
      *
      * @param \Pock\Matchers\RequestMatcherInterface   $matcher
+     * @param \Pock\Factory\ReplyFactoryInterface|null $replyFactory
      * @param \Psr\Http\Message\ResponseInterface|null $response
      * @param \Throwable|null                          $throwable
      * @param int                                      $maxHits
@@ -55,12 +60,14 @@ class Mock implements MockInterface
      */
     public function __construct(
         RequestMatcherInterface $matcher,
+        ?ReplyFactoryInterface $replyFactory,
         ?ResponseInterface $response,
         ?Throwable $throwable,
         int $maxHits,
         int $matchAt
     ) {
         $this->matcher = $matcher;
+        $this->replyFactory = $replyFactory;
         $this->response = $response;
         $this->throwable = $throwable;
         $this->matchAt = $matchAt;
@@ -126,6 +133,14 @@ class Mock implements MockInterface
         }
 
         return $this->response;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getReplyFactory(): ?ReplyFactoryInterface
+    {
+        return $this->replyFactory;
     }
 
     /**

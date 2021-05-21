@@ -120,7 +120,7 @@ In order to use unsupported serializer you should create a decorator which imple
 - [ ] Regexp matchers for body, query and path.  
 - [x] Separate `UniversalMockException` into several exceptions (`PockClientException`, `PockNetworkException`, etc).  
 - [x] Add methods for easier throwing of exceptions listed in previous entry.  
-- [ ] `replyCallback` - reply using specified callback.  
-- [ ] `replyFactory` - reply using specified response factory (provide corresponding interface).  
+- [x] `replyWithCallback` - reply using specified callback.  
+- [x] `replyWithFactory` - reply using specified response factory (provide corresponding interface).  
 - [ ] Compare XML bodies using `DOMDocument`, fallback to text comparison in case of problems.  
 - [ ] Document everything (with examples if it’s feasible).

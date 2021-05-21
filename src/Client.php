@@ -81,6 +81,18 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
                     return new HttpFulfilledPromise($mock->getResponse());
                 }
 
+                if (null !== $mock->getReplyFactory()) {
+                    $mock->registerHit();
+
+                    try {
+                        return new HttpFulfilledPromise(
+                            $mock->getReplyFactory()->createReply($request, new PockResponseBuilder())
+                        );
+                    } catch (Throwable $throwable) {
+                        return new HttpRejectedPromise($throwable);
+                    }
+                }
+
                 $throwable = $mock->getThrowable($request);
 
                 if (null !== $throwable) {
@@ -94,13 +106,23 @@ class Client implements ClientInterface, HttpClient, HttpAsyncClient
         }
 
         if (null !== $this->fallbackClient) {
-            try {
-                return new HttpFulfilledPromise($this->fallbackClient->sendRequest($request));
-            } catch (Throwable $throwable) {
-                return new HttpRejectedPromise($throwable);
-            }
+            return $this->replyWithFallbackClient($request);
         }
 
         throw new UnsupportedRequestException();
+    }
+
+    /**
+     * @param \Psr\Http\Message\RequestInterface $request
+     *
+     * @return \Http\Promise\Promise
+     */
+    protected function replyWithFallbackClient(RequestInterface $request): Promise
+    {
+        try {
+            return new HttpFulfilledPromise($this->fallbackClient->sendRequest($request)); // @phpstan-ignore-line
+        } catch (Throwable $throwable) {
+            return new HttpRejectedPromise($throwable);
+        }
     }
 }

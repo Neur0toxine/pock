@@ -12,13 +12,18 @@ namespace Pock\Tests;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Exception\UnsupportedRequestException;
+use Pock\Factory\ReplyFactoryInterface;
 use Pock\PockBuilder;
+use Pock\PockResponseBuilder;
 use Pock\TestUtils\PockTestCase;
 use Pock\TestUtils\SimpleObject;
+use Pock\TestUtils\TestReplyFactory;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 /**
  * Class PockBuilderTest
@@ -586,5 +591,62 @@ EOF;
 
             self::assertEquals(1 === $i ? 200 : (4 === $i ? 201 : 400), $response->getStatusCode());
         }
+    }
+
+    public function testReplyWithFactory(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->always()
+            ->replyWithFactory(new TestReplyFactory());
+
+        for ($i = 0; $i < 5; $i++) {
+            $response = $builder->getClient()->sendRequest(
+                self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+            );
+
+            self::assertEquals(200, $response->getStatusCode());
+            self::assertEquals('Request #' . ($i + 1), $response->getBody()->getContents());
+        }
+    }
+
+    public function testReplyWithCallback(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->always()
+            ->replyWithCallback(static function (RequestInterface $request, PockResponseBuilder $responseBuilder) {
+                return $responseBuilder->withStatusCode(200)
+                    ->withBody(self::TEST_URI)
+                    ->getResponse();
+            });
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()->createRequest(RequestMethod::GET, self::TEST_URI)
+        );
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals(self::TEST_URI, $response->getBody()->getContents());
+    }
+
+    public function testReplyWithCallbackException(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Exception from the callback');
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->always()
+            ->replyWithCallback(static function (RequestInterface $request, PockResponseBuilder $responseBuilder) {
+                throw new RuntimeException('Exception from the callback');
+            });
+
+         $builder->getClient()->sendRequest(self::getPsr17Factory()->createRequest(
+             RequestMethod::GET,
+             self::TEST_URI
+         ));
     }
 }

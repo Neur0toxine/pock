@@ -15,6 +15,8 @@ use Pock\Enum\RequestScheme;
 use Pock\Exception\PockClientException;
 use Pock\Exception\PockNetworkException;
 use Pock\Exception\PockRequestException;
+use Pock\Factory\CallbackReplyFactory;
+use Pock\Factory\ReplyFactoryInterface;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\BodyMatcher;
 use Pock\Matchers\CallbackRequestMatcher;
@@ -61,6 +63,9 @@ class PockBuilder
 
     /** @var \Pock\PockResponseBuilder|null */
     private $responseBuilder;
+
+    /** @var ReplyFactoryInterface|null */
+    private $replyFactory;
 
     /** @var \Throwable|null */
     private $throwable;
@@ -455,6 +460,31 @@ class PockBuilder
     }
 
     /**
+     * Construct the response during request execution using provided ReplytFactoryInterface implementation.
+     *
+     * @param \Pock\Factory\ReplyFactoryInterface $factory
+     * @see ReplyFactoryInterface
+     */
+    public function replyWithFactory(ReplyFactoryInterface $factory): void
+    {
+        $this->replyFactory = $factory;
+    }
+
+    /**
+     * Construct the response during request execution using provided callback.
+     *
+     * Callback should receive the same parameters as in the `ReplyFactoryInterface::createReply` method.
+     *
+     * @see ReplyFactoryInterface::createReply()
+     *
+     * @param callable $callback
+     */
+    public function replyWithCallback(callable $callback): void
+    {
+        $this->replyWithFactory(new CallbackReplyFactory($callback));
+    }
+
+    /**
      * Resets the builder.
      *
      * @return self
@@ -462,6 +492,7 @@ class PockBuilder
     public function reset(): self
     {
         $this->matcher = new MultipleMatcher();
+        $this->replyFactory = null;
         $this->responseBuilder = null;
         $this->throwable = null;
         $this->maxHits = 1;
@@ -495,7 +526,7 @@ class PockBuilder
 
     private function closePrevious(): void
     {
-        if (null !== $this->responseBuilder || null !== $this->throwable) {
+        if (null !== $this->responseBuilder || null !== $this->replyFactory || null !== $this->throwable) {
             if (0 === count($this->matcher)) {
                 $this->matcher->addMatcher(new AnyRequestMatcher());
             }
@@ -508,12 +539,14 @@ class PockBuilder
 
             $this->mocks[] = new Mock(
                 $this->matcher,
+                $this->replyFactory,
                 $response,
                 $this->throwable,
                 $this->maxHits,
                 $this->matchAt
             );
             $this->matcher = new MultipleMatcher();
+            $this->replyFactory = null;
             $this->responseBuilder = null;
             $this->throwable = null;
             $this->maxHits = 1;
