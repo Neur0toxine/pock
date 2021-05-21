@@ -10,7 +10,9 @@
 namespace Pock\Tests;
 
 use DOMDocument;
+use phpmock\Mock;
 use phpmock\MockBuilder;
+use phpmock\MockRegistry;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Exception\UnsupportedRequestException;
@@ -33,6 +35,11 @@ use RuntimeException;
  */
 class PockBuilderTest extends PockTestCase
 {
+    protected function tearDown(): void
+    {
+        uopz_unset_return('extension_loaded');
+    }
+
     public function testNoHit(): void
     {
         $this->expectException(UnsupportedRequestException::class);
@@ -453,21 +460,20 @@ EOF;
             $this->expectException(UnsupportedRequestException::class);
         }
 
-        $mock = (new MockBuilder())->setNamespace('Pock\Matchers')
-            ->setName('extension_loaded')
-            ->setFunction(
-                static function (string $extension) {
-                    if ('xsl' === $extension) {
-                        return false;
-                    }
-
-                    return \extension_loaded($extension);
-                }
-            )->build();
-        $mock->enable();
-
         $document = new DOMDocument();
         $document->loadXML($simpleObject);
+
+        uopz_set_return(
+            'extension_loaded',
+            function (string $extension) {
+                if ('xsl' === $extension) {
+                    return false;
+                }
+
+                return true;
+            },
+            true
+        );
 
         $builder = new PockBuilder();
         $builder->matchMethod(RequestMethod::GET)
@@ -478,8 +484,6 @@ EOF;
             ->reply(403)
             ->withHeader('Content-Type', 'text/xml')
             ->withXml(['error' => 'Forbidden']);
-
-        $mock->disable();
 
         $response = $builder->getClient()->sendRequest(
             self::getPsr17Factory()
@@ -868,6 +872,7 @@ EOF;
   <field><![CDATA[test]]></field>
 </result>
 EOF;
+
         return [
             [$simpleObject, true],
             [$simpleObject . "\n", false]

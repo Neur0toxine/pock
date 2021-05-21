@@ -11,11 +11,10 @@ namespace Pock\Matchers;
 
 use DOMDocument;
 use Pock\Exception\XmlException;
-use Throwable;
-use XSLTProcessor;
 use Pock\Traits\SeekableStreamDataExtractor;
 use Psr\Http\Message\RequestInterface;
 use RuntimeException;
+use XSLTProcessor;
 
 /**
  * Class XmlBodyMatcher

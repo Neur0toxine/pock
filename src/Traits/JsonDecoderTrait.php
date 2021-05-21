@@ -22,11 +22,11 @@ trait JsonDecoderTrait
     /**
      * json_decode which throws exception on error.
      *
-     * @param string    $json
-     * @param bool|null $associative
-     * @param int       $depth
+     * @param string $json
+     * @param bool   $associative
+     * @param int    $depth
      *
-     * @param int       $flags
+     * @param int    $flags
      *
      * @return mixed
      * @throws \Pock\Exception\JsonException
@@ -35,7 +35,7 @@ trait JsonDecoderTrait
      */
     public static function jsonDecode(
         string $json,
-        ?bool $associative = false,
+        bool $associative = false,
         int $depth = 512,
         int $flags = 0
     ) {
