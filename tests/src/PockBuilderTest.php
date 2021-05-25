@@ -151,6 +151,46 @@ class PockBuilderTest extends PockTestCase
         self::assertEquals('Successful', $response->getBody()->getContents());
     }
 
+    public function testMatchOriginFailure(): void
+    {
+        $incorrectOrigin = RequestScheme::HTTPS . ':///' . self::TEST_HOST;
+
+        $this->expectExceptionMessage($incorrectOrigin);
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchOrigin($incorrectOrigin)
+            ->reply(200)
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody('Successful');
+
+        $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, 'https://another-example.com')
+        );
+    }
+
+    public function testMatchOrigin(): void
+    {
+        $origin = RequestScheme::HTTPS . '://' . self::TEST_HOST;
+        $builder = new PockBuilder();
+
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchOrigin($origin)
+            ->reply(200)
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody('Successful');
+
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::GET, $origin)
+        );
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/plain']], $response->getHeaders());
+        self::assertEquals('Successful', $response->getBody()->getContents());
+    }
+
     public function testMatchExactHeader(): void
     {
         $builder = new PockBuilder();

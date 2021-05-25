@@ -43,6 +43,7 @@ use Pock\Traits\JsonDecoderTrait;
 use Pock\Traits\JsonSerializerAwareTrait;
 use Pock\Traits\XmlSerializerAwareTrait;
 use Psr\Http\Client\ClientInterface;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -127,6 +128,33 @@ class PockBuilder
     public function matchHost(string $host): self
     {
         return $this->addMatcher(new HostMatcher($host));
+    }
+
+    /**
+     * Matches request by origin.
+     *
+     * @param string $origin
+     *
+     * @return self
+     * @throws \RuntimeException
+     */
+    public function matchOrigin(string $origin): self
+    {
+        $parsed = parse_url($origin);
+
+        if (!is_array($parsed)) {
+            throw new RuntimeException('Malformed origin: ' . $origin);
+        }
+
+        if (array_key_exists('scheme', $parsed) && !empty($parsed['scheme'])) {
+            $this->matchScheme($parsed['scheme']);
+        }
+
+        if (array_key_exists('host', $parsed) && !empty($parsed['host'])) {
+            $this->matchHost($parsed['host']);
+        }
+
+        return $this;
     }
 
     /**
