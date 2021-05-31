@@ -47,7 +47,10 @@ class RecursiveLtrArrayComparator extends RecursiveArrayComparator
         }
 
         foreach ($needle as $key => $value) {
-            if (is_array($value) && !self::recursiveCompareArrays($value, $haystack[$key])) {
+            if (
+                is_array($value) &&
+                (!is_array($haystack[$key]) || !self::recursiveCompareArrays($value, $haystack[$key]))
+            ) {
                 return false;
             }
 
