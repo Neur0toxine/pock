@@ -124,4 +124,5 @@ In order to use unsupported serializer you should create a decorator which imple
 - [x] Compare XML bodies using `DOMDocument`, fallback to text comparison in case of problems.  
 - [ ] Regexp matchers for body, query and path.  
 - [ ] `symfony/http-client` support.  
+- [ ] Real network response for mocked & unmatched requests.  
 - [ ] Document everything (with examples if it’s feasible).
