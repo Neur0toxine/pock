@@ -9,22 +9,20 @@
 
 namespace Pock;
 
-use Diff\ArrayComparer\StrictArrayComparer;
 use DOMDocument;
-use Pock\Enum\RequestMethod;
-use Pock\Enum\RequestScheme;
 use Pock\Exception\PockClientException;
 use Pock\Exception\PockNetworkException;
 use Pock\Exception\PockRequestException;
-use Pock\Exception\XmlException;
 use Pock\Factory\CallbackReplyFactory;
 use Pock\Factory\ReplyFactoryInterface;
 use Pock\Matchers\AnyRequestMatcher;
 use Pock\Matchers\BodyMatcher;
 use Pock\Matchers\CallbackRequestMatcher;
+use Pock\Matchers\ExactFormDataMatcher;
 use Pock\Matchers\ExactHeaderMatcher;
 use Pock\Matchers\ExactHeadersMatcher;
 use Pock\Matchers\ExactQueryMatcher;
+use Pock\Matchers\FormDataMatcher;
 use Pock\Matchers\HeaderLineMatcher;
 use Pock\Matchers\HeaderLineRegexpMatcher;
 use Pock\Matchers\HeaderMatcher;
@@ -32,9 +30,14 @@ use Pock\Matchers\HeadersMatcher;
 use Pock\Matchers\HostMatcher;
 use Pock\Matchers\JsonBodyMatcher;
 use Pock\Matchers\MethodMatcher;
+use Pock\Matchers\MultipartFormDataMatcher;
 use Pock\Matchers\MultipleMatcher;
 use Pock\Matchers\PathMatcher;
 use Pock\Matchers\QueryMatcher;
+use Pock\Matchers\RegExpBodyMatcher;
+use Pock\Matchers\RegExpPathMatcher;
+use Pock\Matchers\RegExpQueryMatcher;
+use Pock\Matchers\RegExpUriMatcher;
 use Pock\Matchers\RequestMatcherInterface;
 use Pock\Matchers\SchemeMatcher;
 use Pock\Matchers\UriMatcher;
@@ -55,6 +58,7 @@ use Throwable;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class PockBuilder
 {
@@ -170,6 +174,19 @@ class PockBuilder
     }
 
     /**
+     * Matches request by the whole URI using regular expression.
+     *
+     * @param string $expression
+     * @param int    $flags
+     *
+     * @return self
+     */
+    public function matchUriRegExp(string $expression, int $flags = 0): self
+    {
+        return $this->addMatcher(new RegExpUriMatcher($expression, $flags));
+    }
+
+    /**
      * Matches request by header value or several values. Header can have other values which are not specified here.
      * @see PockBuilder::matchExactHeader() if you want to match exact header values.
      *
@@ -263,6 +280,20 @@ class PockBuilder
     }
 
     /**
+     * Match request by its path using regular expression. This matcher doesn't care about prefix slash
+     * since it's pretty easy to do it using regular expression.
+     *
+     * @param string $expression
+     * @param int    $flags
+     *
+     * @return self
+     */
+    public function matchPathRegExp(string $expression, int $flags = 0): self
+    {
+        return $this->addMatcher(new RegExpPathMatcher($expression, $flags));
+    }
+
+    /**
      * Match request by its query. Request can contain other query variables.
      * @see PockBuilder::matchExactQuery() if you want to match an entire query string.
      *
@@ -273,6 +304,19 @@ class PockBuilder
     public function matchQuery(array $query): self
     {
         return $this->addMatcher(new QueryMatcher($query));
+    }
+
+    /**
+     * Match request by its query using regular expression.
+     *
+     * @param string $expression
+     * @param int    $flags
+     *
+     * @return self
+     */
+    public function matchQueryRegExp(string $expression, int $flags = 0): self
+    {
+        return $this->addMatcher(new RegExpQueryMatcher($expression, $flags));
     }
 
     /**
@@ -288,6 +332,44 @@ class PockBuilder
     }
 
     /**
+     * Match request with form-data.
+     *
+     * @param array<string, mixed> $formFields
+     *
+     * @return self
+     */
+    public function matchFormData(array $formFields): self
+    {
+        return $this->addMatcher(new FormDataMatcher($formFields));
+    }
+
+    /**
+     * Match request with form-data. Additional fields aren't allowed.
+     *
+     * @param array<string, mixed> $formFields
+     *
+     * @return self
+     */
+    public function matchExactFormData(array $formFields): self
+    {
+        return $this->addMatcher(new ExactFormDataMatcher($formFields));
+    }
+
+    /**
+     * Match request multipart form data. Will not match the request if body is not multipart.
+     * Uses third-party library to parse the data.
+     *
+     * @param callable $callback Accepts Riverline\MultiPartParser\StreamedPart as an argument, returns true if matched.
+     *
+     * @return self
+     * @see https://github.com/Riverline/multipart-parser#usage
+     */
+    public function matchMultipartFormData(callable $callback): self
+    {
+        return $this->addMatcher(new MultipartFormDataMatcher($callback));
+    }
+
+    /**
      * Match entire request body.
      *
      * @param \Psr\Http\Message\StreamInterface|resource|string $data
@@ -297,6 +379,19 @@ class PockBuilder
     public function matchBody($data): self
     {
         return $this->addMatcher(new BodyMatcher($data));
+    }
+
+    /**
+     * Match entire request body using provided regular expression.
+     *
+     * @param string $expression
+     * @param int    $flags
+     *
+     * @return self
+     */
+    public function matchBodyRegExp(string $expression, int $flags = 0): self
+    {
+        return $this->addMatcher(new RegExpBodyMatcher($expression, $flags));
     }
 
     /**
@@ -373,7 +468,7 @@ class PockBuilder
      * Match request using provided callback. Callback should receive RequestInterface and return boolean.
      * If returned value is true then request is matched.
      *
-     * @param callable $callback
+     * @param callable $callback Callable that accepts PSR-7 RequestInterface as it's first argument.
      *
      * @return self
      */

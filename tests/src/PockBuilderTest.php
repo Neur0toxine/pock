@@ -10,6 +10,7 @@
 namespace Pock\Tests;
 
 use DOMDocument;
+use Http\Message\MultipartStream\MultipartStreamBuilder;
 use Pock\Enum\RequestMethod;
 use Pock\Enum\RequestScheme;
 use Pock\Exception\UnsupportedRequestException;
@@ -23,6 +24,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestInterface;
+use Riverline\MultiPartParser\StreamedPart;
 use RuntimeException;
 
 /**
@@ -577,6 +579,127 @@ EOF;
         self::assertEquals(403, $response->getStatusCode());
         self::assertEquals(['Content-Type' => ['text/xml']], $response->getHeaders());
         self::assertEquals($xml, $response->getBody()->getContents());
+    }
+
+    public function testMultipartFormDataMock(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::POST)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->matchMultipartFormData(function (StreamedPart $part) {
+                return $part->isMultiPart() &&
+                    1 === count($part->getPartsByName('param1')) &&
+                    1 === count($part->getPartsByName('param2')) &&
+                    'value1' === $part->getPartsByName('param1')[0]->getBody() &&
+                    'value2' === $part->getPartsByName('param2')[0]->getBody() &&
+                    'text/plain' === $part->getPartsByName('param1')[0]->getHeader('Content-Type');
+            })->reply(200)
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody('ok');
+
+        $streamBuilder = (new MultipartStreamBuilder(self::getPsr17Factory()))
+            ->addResource('param1', 'value1', ['headers' => ['Content-Type' => 'text/plain']])
+            ->addResource('param2', 'value2');
+        $response = $builder->getClient()->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::POST, self::TEST_URI)
+                ->withHeader('Content-Type', 'multipart/form-data; boundary="' . $streamBuilder->getBoundary() .  '"')
+                ->withBody($streamBuilder->build())
+        );
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals(['Content-Type' => ['text/plain']], $response->getHeaders());
+        self::assertEquals('ok', $response->getBody()->getContents());
+    }
+
+    public function testMatchBodyRegExp(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->matchBodyRegExp('/\d+-\d+/')
+            ->reply(200);
+
+        $response = $builder->getClient()->sendRequest(static::getRequestWithBody('test matchable 23-900'));
+
+        self::assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testMatchPathRegExp(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchOrigin(self::TEST_HOST)
+            ->matchPathRegExp('/^\/?test$/')
+            ->reply(200);
+
+        $response = $builder->getClient()->sendRequest(
+            static::getTestRequest()->withUri(static::getPsr17Factory()->createUri('https://test.com/test'))
+        );
+
+        self::assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testMatchQueryRegExp(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchOrigin(self::TEST_HOST)
+            ->matchQueryRegExp('/\d+-\d+/')
+            ->reply(200);
+
+        $response = $builder->getClient()->sendRequest(
+            static::getTestRequest()->withUri(
+                static::getPsr17Factory()->createUri(self::TEST_URI)
+                    ->withQuery('param=23-900')
+            )
+        );
+
+        self::assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testMatchUriRegExp(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUriRegExp('/https\:\/\/\w+\.com\/\d+-\d+\?param=\d+-\d+/')
+            ->reply(200);
+
+        $response = $builder->getClient()->sendRequest(
+            static::getTestRequest()->withUri(
+                static::getPsr17Factory()->createUri('https://example.com/23-900')
+                    ->withQuery('param=23-900')
+            )
+        );
+
+        self::assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testMatchFormData(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->matchFormData(['field2' => 'value2'])
+            ->reply(200);
+
+        $response = $builder->getClient()->sendRequest(self::getRequestWithBody('field1=value1&field2=value2'));
+
+        self::assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testMatchExactFormData(): void
+    {
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->matchExactFormData(['field2' => 'value2'])
+            ->reply(200);
+
+        $response = $builder->getClient()->sendRequest(self::getRequestWithBody('field2=value2'));
+
+        self::assertEquals(200, $response->getStatusCode());
     }
 
     public function testFirstExampleApiMock(): void
