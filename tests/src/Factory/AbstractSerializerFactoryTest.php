@@ -12,7 +12,7 @@ namespace Pock\Tests\Factory;
 use PHPUnit\Framework\TestCase;
 use Pock\Factory\JsonSerializerFactory;
 use Pock\Factory\XmlSerializerFactory;
-use Pock\Serializer\CallbackSerializerDecorator;
+use Pock\Serializer\CallbackSerializerAdapter;
 use Pock\Serializer\SerializerInterface;
 use Pock\TestUtils\EmptyJsonSerializerDecorator;
 use Pock\TestUtils\EmptyXmlSerializerDecorator;

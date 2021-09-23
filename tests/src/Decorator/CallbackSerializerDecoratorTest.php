@@ -10,7 +10,7 @@
 namespace Pock\Tests\Decorator;
 
 use PHPUnit\Framework\TestCase;
-use Pock\Serializer\CallbackSerializerDecorator;
+use Pock\Serializer\CallbackSerializerAdapter;
 
 /**
  * Class CallbackSerializerDecoratorTest
@@ -22,7 +22,7 @@ class CallbackSerializerDecoratorTest extends TestCase
 {
     public function testSerialize(): void
     {
-        self::assertEquals('{}', (new CallbackSerializerDecorator(function ($data) {
+        self::assertEquals('{}', (new CallbackSerializerAdapter(function ($data) {
             return $data;
         }))->serialize('{}'));
     }

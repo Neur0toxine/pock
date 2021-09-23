@@ -10,7 +10,7 @@
 namespace Pock\Creator;
 
 use Pock\Serializer\SerializerInterface;
-use Pock\Serializer\SymfonySerializerDecorator;
+use Pock\Serializer\SymfonySerializerAdapter;
 
 /**
  * Class AbstractSymfonySerializerCreator
@@ -33,7 +33,7 @@ abstract class AbstractSymfonySerializerCreator implements SerializerCreatorInte
             $normalizer = self::OBJECT_NORMALIZER_CLASS;
             $encoder = static::getEncoderClass();
 
-            return new SymfonySerializerDecorator(
+            return new SymfonySerializerAdapter(
                 new $serializer([new $normalizer()], [new $encoder()]),
                 static::getFormat()
             );

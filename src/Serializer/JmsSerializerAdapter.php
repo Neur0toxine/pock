@@ -3,19 +3,19 @@
 /**
  * PHP 7.2
  *
- * @category JmsSerializerDecorator
+ * @category JmsSerializerAdapter
  * @package  Pock\Serializer
  */
 
 namespace Pock\Serializer;
 
 /**
- * Class JmsSerializerDecorator
+ * Class JmsSerializerAdapter
  *
- * @category JmsSerializerDecorator
+ * @category JmsSerializerAdapter
  * @package  Pock\Serializer
  */
-class JmsSerializerDecorator implements SerializerInterface
+class JmsSerializerAdapter implements SerializerInterface
 {
     /** @var object */
     private $serializer;
@@ -24,7 +24,7 @@ class JmsSerializerDecorator implements SerializerInterface
     private $format;
 
     /**
-     * JmsSerializerDecorator constructor.
+     * JmsSerializerAdapter constructor.
      *
      * @param object $serializer
      */

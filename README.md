@@ -97,7 +97,7 @@ if you want to override default behavior.
 ```php
 use Pock\Factory\JsonSerializerFactory;
 use Pock\Factory\XmlSerializerFactory;
-use Pock\Serializer\SymfonySerializerDecorator;
+use Pock\Serializer\SymfonySerializerAdapter;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -105,7 +105,7 @@ use Symfony\Component\Serializer\Serializer;
 
 $encoders = [new XmlEncoder(), new JsonEncoder()];
 $normalizers = [new ObjectNormalizer()];
-$serializer = new SymfonySerializerDecorator(new Serializer($normalizers, $encoders));
+$serializer = new SymfonySerializerAdapter(new Serializer($normalizers, $encoders));
 
 JsonSerializerFactory::setSerializer($serializer);
 XmlSerializerFactory::setSerializer($serializer);
@@ -125,7 +125,7 @@ In order to use unsupported serializer you should create an adapter which implem
 - [x] Regexp matchers for body, query, URI and path.  
 - [x] Form Data body matcher (partial & exact)
 - [x] Multipart form body matcher (just like callback matcher but parses the body as a multipart form data)  
-- [ ] **BREAKING CHANGE:** Rename serializer decorators to serializer adapters.  
+- [x] **BREAKING CHANGE:** Rename serializer decorators to serializer adapters.  
 - [ ] `symfony/http-client` support.  
 - [ ] Real network response for mocked & unmatched requests.  
 - [ ] Document everything (with examples if it’s feasible).

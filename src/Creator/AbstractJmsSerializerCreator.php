@@ -10,7 +10,7 @@
 namespace Pock\Creator;
 
 use Throwable;
-use Pock\Serializer\JmsSerializerDecorator;
+use Pock\Serializer\JmsSerializerAdapter;
 use Pock\Serializer\SerializerInterface;
 
 /**
@@ -36,7 +36,7 @@ abstract class AbstractJmsSerializerCreator implements SerializerCreatorInterfac
                 $builder = call_user_func([self::BUILDER_CLASS, 'create']);
 
                 if (null !== $builder && method_exists($builder, 'build')) {
-                    return new JmsSerializerDecorator($builder->build(), static::getFormat()); // @phpstan-ignore-line
+                    return new JmsSerializerAdapter($builder->build(), static::getFormat()); // @phpstan-ignore-line
                 }
             } catch (Throwable $throwable) {
                 return null;

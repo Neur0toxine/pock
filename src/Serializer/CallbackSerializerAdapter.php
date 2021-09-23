@@ -3,7 +3,7 @@
 /**
  * PHP 7.1
  *
- * @category CallbackSerializerDecorator
+ * @category CallbackSerializerAdapter
  * @package  Pock\Serializer
  */
 
@@ -12,18 +12,18 @@ namespace Pock\Serializer;
 use RuntimeException;
 
 /**
- * Class CallbackSerializerDecorator
+ * Class CallbackSerializerAdapter
  *
- * @category CallbackSerializerDecorator
+ * @category CallbackSerializerAdapter
  * @package  Pock\Serializer
  */
-class CallbackSerializerDecorator implements SerializerInterface
+class CallbackSerializerAdapter implements SerializerInterface
 {
     /** @var callable */
     private $callback;
 
     /**
-     * CallbackSerializerDecorator constructor.
+     * CallbackSerializerAdapter constructor.
      *
      * @param callable $callback
      */
