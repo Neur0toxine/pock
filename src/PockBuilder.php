@@ -46,6 +46,8 @@ use Pock\Traits\JsonDecoderTrait;
 use Pock\Traits\JsonSerializerAwareTrait;
 use Pock\Traits\XmlSerializerAwareTrait;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Throwable;
 
@@ -643,6 +645,22 @@ class PockBuilder
     public function replyWithCallback(callable $callback): void
     {
         $this->replyWithFactory(new CallbackReplyFactory($callback));
+    }
+
+    /**
+     * Reply to the request using provided client. Can be used to send real network request.
+     *
+     * @param \Psr\Http\Client\ClientInterface $client
+     * @SuppressWarnings(unused)
+     */
+    public function replyWithClient(ClientInterface $client): void
+    {
+        $this->replyWithCallback(function (
+            RequestInterface $request,
+            PockResponseBuilder $responseBuilder
+        ) use ($client): ResponseInterface {
+            return $client->sendRequest($request);
+        });
     }
 
     /**

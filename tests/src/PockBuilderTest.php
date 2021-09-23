@@ -1035,10 +1035,29 @@ EOF;
                 throw new RuntimeException('Exception from the callback');
             });
 
-         $builder->getClient()->sendRequest(self::getPsr17Factory()->createRequest(
-             RequestMethod::GET,
-             self::TEST_URI
-         ));
+        $builder->getClient()->sendRequest(self::getPsr17Factory()->createRequest(
+            RequestMethod::GET,
+            self::TEST_URI
+        ));
+    }
+
+    public function testReplyWithClient(): void
+    {
+        $inlined = new PockBuilder();
+        $inlined->reply(429);
+
+        $builder = new PockBuilder();
+        $builder->matchMethod(RequestMethod::GET)
+            ->matchUri(self::TEST_URI)
+            ->always()
+            ->replyWithClient($inlined->getClient());
+
+        $response = $builder->getClient()->sendRequest(self::getPsr17Factory()->createRequest(
+            RequestMethod::GET,
+            self::TEST_URI
+        ));
+
+        self::assertEquals(429, $response->getStatusCode());
     }
 
     public function matchXmlNoXslProvider(): array
