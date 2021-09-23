@@ -3,22 +3,22 @@
 /**
  * PHP 7.1
  *
- * @category CallbackSerializerDecoratorTest
- * @package  Pock\Tests\Decorator
+ * @category CallbackSerializerAdapterTest
+ * @package  Pock\Tests\Serializer
  */
 
-namespace Pock\Tests\Decorator;
+namespace Pock\Tests\Serializer;
 
 use PHPUnit\Framework\TestCase;
 use Pock\Serializer\CallbackSerializerAdapter;
 
 /**
- * Class CallbackSerializerDecoratorTest
+ * Class CallbackSerializerAdapterTest
  *
- * @category CallbackSerializerDecoratorTest
- * @package  Pock\Tests\Decorator
+ * @category CallbackSerializerAdapterTest
+ * @package  Pock\Tests\Serializer
  */
-class CallbackSerializerDecoratorTest extends TestCase
+class CallbackSerializerAdapterTest extends TestCase
 {
     public function testSerialize(): void
     {
