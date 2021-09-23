@@ -111,7 +111,7 @@ JsonSerializerFactory::setSerializer($serializer);
 XmlSerializerFactory::setSerializer($serializer);
 ```
 
-In order to use unsupported serializer you should create a decorator which implements `Pock\Serializer\SerializerInterface`.
+In order to use unsupported serializer you should create an adapter which implements `Pock\Serializer\SerializerInterface`.
 
 # Roadmap to stable
 
