@@ -715,6 +715,19 @@ EOF;
             ->matchScheme(RequestScheme::HTTPS)
             ->matchHost(self::TEST_HOST)
             ->matchPath('/ping')
+            ->matchHeaders([
+                'Authorization' => 'Token token_3',
+                'Content-Type' => 'application/json'
+            ])
+            ->matchSerializedJsonBody('{"field": "value3"}')
+            ->reply(200)
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody('Third token (post json with match against serialized data)');
+
+        $builder->matchMethod(RequestMethod::POST)
+            ->matchScheme(RequestScheme::HTTPS)
+            ->matchHost(self::TEST_HOST)
+            ->matchPath('/ping')
             ->matchHeader('Authorization', 'Token token_2')
             ->matchBody('test data')
             ->reply(200)
@@ -778,6 +791,19 @@ EOF;
                 ->withBody(self::getPsr17Factory()->createStream('{"field": "value"}'))
         );
         self::assertEquals('Second token (post json)', $response->getBody()->getContents());
+
+        $response = $client->sendRequest(
+            self::getPsr17Factory()
+                ->createRequest(RequestMethod::POST, self::TEST_URI)
+                ->withHeader('Authorization', 'Token token_3')
+                ->withHeader('Content-Type', 'application/json')
+                ->withUri(self::getPsr17Factory()->createUri(self::TEST_URI . 'ping'))
+                ->withBody(self::getPsr17Factory()->createStream('{"field": "value3"}'))
+        );
+        self::assertEquals(
+            'Third token (post json with match against serialized data)',
+            $response->getBody()->getContents()
+        );
 
         $response = $client->sendRequest(
             self::getPsr17Factory()

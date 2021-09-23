@@ -318,17 +318,35 @@ class PockBuilder
     }
 
     /**
+     * Match JSON request body against JSON string or array with data.
+     *
+     * @param array<int|string, mixed>|string $data
+     *
+     * @return self
+     * @throws \Pock\Exception\JsonException
+     */
+    public function matchSerializedJsonBody($data): self
+    {
+        if (is_string($data)) {
+            $data = self::jsonDecode($data, true);
+        }
+
+        return $this->addMatcher(new JsonBodyMatcher($data));
+    }
+
+    /**
      * Match XML request body using raw XML data.
      *
      * **Note:** this method will fallback to the string comparison if ext-xsl is not available.
      * It also doesn't serializer values with available XML serializer.
      * Use PockBuilder::matchSerializedXmlBody if you want to execute available serializer.
      *
-     * @see \Pock\PockBuilder::matchSerializedXmlBody()
-     *
      * @param DOMDocument|\Psr\Http\Message\StreamInterface|resource|string $data
      *
      * @return self
+     * @throws \Pock\Exception\XmlException
+     * @see \Pock\PockBuilder::matchSerializedXmlBody()
+     *
      */
     public function matchXmlBody($data): self
     {
