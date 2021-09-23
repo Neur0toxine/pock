@@ -123,8 +123,8 @@ In order to use unsupported serializer you should create a decorator which imple
 - [x] `replyWithFactory` - reply using specified response factory (provide corresponding interface).  
 - [x] Compare XML bodies using `DOMDocument`, fallback to text comparison in case of problems.  
 - [ ] Regexp matchers for body, query and path.  
-- [ ] Form Data body matcher  
-- [ ] Multipart form body matcher  
+- [ ] Form Data body matcher (partial & exact)  
+- [ ] Multipart form body matcher (partial & exact)  
 - [ ] `symfony/http-client` support.  
 - [ ] Real network response for mocked & unmatched requests.  
 - [ ] Document everything (with examples if it’s feasible).
