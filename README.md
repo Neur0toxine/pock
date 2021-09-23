@@ -127,5 +127,5 @@ In order to use unsupported serializer you should create an adapter which implem
 - [x] Multipart form body matcher (just like callback matcher but parses the body as a multipart form data)  
 - [x] **BREAKING CHANGE:** Rename serializer decorators to serializer adapters.  
 - [ ] `symfony/http-client` support.  
-- [ ] Real network response for mocked & unmatched requests.  
+- [ ] Real network response for mocked requests.  
 - [ ] Document everything (with examples if it’s feasible).
