@@ -174,7 +174,7 @@ class PockBuilderTest extends PockTestCase
 
     public function testMatchOrigin(): void
     {
-        $origin = RequestScheme::HTTPS . '://' . self::TEST_HOST;
+        $origin = RequestScheme::HTTPS . '://' . self::TEST_HOST . ':443';
         $builder = new PockBuilder();
 
         $builder->matchMethod(RequestMethod::GET)

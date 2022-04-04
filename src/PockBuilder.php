@@ -33,6 +33,7 @@ use Pock\Matchers\MethodMatcher;
 use Pock\Matchers\MultipartFormDataMatcher;
 use Pock\Matchers\MultipleMatcher;
 use Pock\Matchers\PathMatcher;
+use Pock\Matchers\PortMatcher;
 use Pock\Matchers\QueryMatcher;
 use Pock\Matchers\RegExpBodyMatcher;
 use Pock\Matchers\RegExpPathMatcher;
@@ -49,6 +50,8 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
+use Symfony\Component\HttpClient\Psr18Client;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
 /**
@@ -60,6 +63,7 @@ use Throwable;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class PockBuilder
@@ -137,6 +141,18 @@ class PockBuilder
     }
 
     /**
+     * Matches request by the port.
+     *
+     * @param int $port
+     *
+     * @return self
+     */
+    public function matchPort(int $port): self
+    {
+        return $this->addMatcher(new PortMatcher($port));
+    }
+
+    /**
      * Matches request by origin.
      *
      * @param string $origin
@@ -158,6 +174,10 @@ class PockBuilder
 
         if (array_key_exists('host', $parsed) && !empty($parsed['host'])) {
             $this->matchHost($parsed['host']);
+        }
+
+        if (array_key_exists('port', $parsed) && is_int($parsed['port']) && $parsed['port'] > 0) {
+            $this->matchPort($parsed['port']);
         }
 
         return $this;
