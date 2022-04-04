@@ -1,3 +1,6 @@
+includes:
+	- phpstan-baseline.neon # TODO: Configure new phpstan
+
 parameters:
     level: max
     paths:

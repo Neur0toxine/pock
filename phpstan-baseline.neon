@@ -1,0 +1,132 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Pock\\\\Client\\:\\:doSendRequest\\(\\) should return Psr\\\\Http\\\\Message\\\\ResponseInterface but returns mixed\\.$#"
+			count: 1
+			path: src/Client.php
+
+		-
+			message: "#^Method Pock\\\\Comparator\\\\ComparatorLocator\\:\\:get\\(\\) should return Pock\\\\Comparator\\\\ComparatorInterface but returns object\\.$#"
+			count: 1
+			path: src/Comparator/ComparatorLocator.php
+
+		-
+			message: "#^Static property Pock\\\\Comparator\\\\ComparatorLocator\\:\\:\\$comparators \\(array\\<Pock\\\\Comparator\\\\ComparatorInterface\\>\\) does not accept array\\<object\\>\\.$#"
+			count: 1
+			path: src/Comparator/ComparatorLocator.php
+
+		-
+			message: "#^Unsafe access to private property Pock\\\\Comparator\\\\ComparatorLocator\\:\\:\\$comparators through static\\:\\:\\.$#"
+			count: 3
+			path: src/Comparator/ComparatorLocator.php
+
+		-
+			message: "#^Parameter \\#1 \\$object_or_class of function method_exists expects object\\|string, mixed given\\.$#"
+			count: 1
+			path: src/Creator/AbstractJmsSerializerCreator.php
+
+		-
+			message: "#^Parameter \\#2 \\$encoders of class Symfony\\\\Component\\\\Serializer\\\\Serializer constructor expects array\\<Symfony\\\\Component\\\\Serializer\\\\Encoder\\\\DecoderInterface\\|Symfony\\\\Component\\\\Serializer\\\\Encoder\\\\EncoderInterface\\>, array\\<int, object\\> given\\.$#"
+			count: 1
+			path: src/Creator/AbstractSymfonySerializerCreator.php
+
+		-
+			message: "#^Method Pock\\\\Factory\\\\CallbackReplyFactory\\:\\:createReply\\(\\) should return Psr\\\\Http\\\\Message\\\\ResponseInterface but returns mixed\\.$#"
+			count: 1
+			path: src/Factory/CallbackReplyFactory.php
+
+		-
+			message: "#^Unsafe access to private property Pock\\\\Factory\\\\JsonSerializerFactory\\:\\:\\$mainSerializer through static\\:\\:\\.$#"
+			count: 2
+			path: src/Factory/JsonSerializerFactory.php
+
+		-
+			message: "#^Unsafe access to private property Pock\\\\Factory\\\\XmlSerializerFactory\\:\\:\\$mainSerializer through static\\:\\:\\.$#"
+			count: 2
+			path: src/Factory/XmlSerializerFactory.php
+
+		-
+			message: "#^Method Pock\\\\Matchers\\\\CallbackRequestMatcher\\:\\:matches\\(\\) should return bool but returns mixed\\.$#"
+			count: 1
+			path: src/Matchers/CallbackRequestMatcher.php
+
+		-
+			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\ExactHeadersMatcher\\:\\:headerValuesEqual\\(\\) through static\\:\\:\\.$#"
+			count: 2
+			path: src/Matchers/ExactHeadersMatcher.php
+
+		-
+			message: "#^Method Pock\\\\Matchers\\\\JsonBodyMatcher\\:\\:deserialize\\(\\) should return array\\|null but returns mixed\\.$#"
+			count: 1
+			path: src/Matchers/JsonBodyMatcher.php
+
+		-
+			message: "#^Parameter \\#3 \\$depth of function json_decode expects int\\<1, max\\>, int given\\.$#"
+			count: 1
+			path: src/Matchers/JsonBodyMatcher.php
+
+		-
+			message: "#^Method Pock\\\\Matchers\\\\MultipartFormDataMatcher\\:\\:matches\\(\\) should return bool but returns mixed\\.$#"
+			count: 1
+			path: src/Matchers/MultipartFormDataMatcher.php
+
+		-
+			message: "#^Method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:sortXmlTags\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe access to private constant Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:TAG_SORT_XSLT through static\\:\\:\\.$#"
+			count: 1
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe access to private property Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:\\$sorter through static\\:\\:\\.$#"
+			count: 4
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:createDOMDocument\\(\\) through static\\:\\:\\.$#"
+			count: 2
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:getDOMString\\(\\) through static\\:\\:\\.$#"
+			count: 1
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:getSorter\\(\\) through static\\:\\:\\.$#"
+			count: 1
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:hasExtension\\(\\) through static\\:\\:\\.$#"
+			count: 4
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:sortXmlTags\\(\\) through static\\:\\:\\.$#"
+			count: 2
+			path: src/Matchers/XmlBodyMatcher.php
+
+		-
+			message: "#^Parameter \\#1 \\$data of class Pock\\\\Matchers\\\\JsonBodyMatcher constructor expects array, mixed given\\.$#"
+			count: 2
+			path: src/PockBuilder.php
+
+		-
+			message: "#^Parameter \\#3 \\$depth of function json_decode expects int\\<1, max\\>, int given\\.$#"
+			count: 1
+			path: src/PockBuilder.php
+
+		-
+			message: "#^Parameter \\#3 \\$depth of function json_encode expects int\\<1, max\\>, int given\\.$#"
+			count: 1
+			path: src/PockBuilder.php
+
+		-
+			message: "#^Parameter \\#3 \\$depth of function json_encode expects int\\<1, max\\>, int given\\.$#"
+			count: 1
+			path: src/PockResponseBuilder.php
+
