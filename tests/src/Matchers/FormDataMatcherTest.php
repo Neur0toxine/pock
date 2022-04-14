@@ -44,9 +44,17 @@ class FormDataMatcherTest extends PockTestCase
         self::assertFalse($matcher->matches($request));
     }
 
-    public function testMatches(): void
+    public function testNoMatchesExtraValues(): void
     {
         $matcher = new FormDataMatcher(['field2' => 'value2']);
+        $request = self::getRequestWithBody('field1=value1&field2=value2');
+
+        self::assertFalse($matcher->matches($request));
+    }
+
+    public function testMatches(): void
+    {
+        $matcher = new FormDataMatcher(['field1' => 'value1', 'field2' => 'value2']);
         $request = self::getRequestWithBody('field1=value1&field2=value2');
 
         self::assertTrue($matcher->matches($request));

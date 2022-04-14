@@ -10,7 +10,7 @@
 namespace Pock\Matchers;
 
 use Pock\Comparator\ComparatorLocator;
-use Pock\Comparator\RecursiveLtrArrayComparator;
+use Pock\Comparator\RecursiveArrayComparator;
 use Pock\Traits\SeekableStreamDataExtractor;
 use Psr\Http\Message\RequestInterface;
 
@@ -35,6 +35,6 @@ class FormDataMatcher extends QueryMatcher
             return false;
         }
 
-        return ComparatorLocator::get(RecursiveLtrArrayComparator::class)->compare($this->query, $query);
+        return ComparatorLocator::get(RecursiveArrayComparator::class)->compare($this->query, $query);
     }
 }

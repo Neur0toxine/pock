@@ -681,7 +681,7 @@ EOF;
         $builder = new PockBuilder();
         $builder->matchMethod(RequestMethod::GET)
             ->matchUri(self::TEST_URI)
-            ->matchFormData(['field2' => 'value2'])
+            ->matchFormData(['field1' => 'value1', 'field2' => 'value2'])
             ->reply(200);
 
         $response = $builder->getClient()->sendRequest(self::getRequestWithBody('field1=value1&field2=value2'));
