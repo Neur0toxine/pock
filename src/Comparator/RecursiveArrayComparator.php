@@ -50,8 +50,12 @@ class RecursiveArrayComparator implements ComparatorInterface
         }
 
         foreach ($first as $key => $value) {
-            if (is_array($value) && !self::recursiveCompareArrays($value, $second[$key])) {
-                return false;
+            if (is_array($value)) {
+                if (!is_array($second[$key]) || !self::recursiveCompareArrays($value, $second[$key])) {
+                    return false;
+                }
+
+                continue;
             }
 
             if ($value !== $second[$key]) {

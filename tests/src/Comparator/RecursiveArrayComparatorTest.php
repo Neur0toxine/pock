@@ -3,7 +3,7 @@
 /**
  * PHP version 7.3
  *
- * @category RecursiveArrayLtrComparatorTest
+ * @category RecursiveArrayComparatorTest
  * @package  Pock\Tests\Comparator
  */
 
@@ -11,15 +11,15 @@ namespace Pock\Tests\Comparator;
 
 use PHPUnit\Framework\TestCase;
 use Pock\Comparator\ComparatorLocator;
-use Pock\Comparator\RecursiveLtrArrayComparator;
+use Pock\Comparator\RecursiveArrayComparator;
 
 /**
- * Class RecursiveArrayLtrComparatorTest
+ * Class RecursiveArrayComparatorTest
  *
- * @category RecursiveArrayLtrComparatorTest
+ * @category RecursiveArrayComparatorTest
  * @package  Pock\Tests\Comparator
  */
-class RecursiveArrayLtrComparatorTest extends TestCase
+class RecursiveArrayComparatorTest extends TestCase
 {
     public function testMatches(): void
     {
@@ -27,7 +27,8 @@ class RecursiveArrayLtrComparatorTest extends TestCase
             'filter' => [
                 'createdAtFrom' => '2020-01-01 00:00:00',
                 'createdAtTo' => '2021-08-01 00:00:00',
-            ]
+            ],
+            'test' => ''
         ];
         $haystack = [
             'filter' => [
@@ -37,7 +38,7 @@ class RecursiveArrayLtrComparatorTest extends TestCase
             'test' => ''
         ];
 
-        self::assertTrue(ComparatorLocator::get(RecursiveLtrArrayComparator::class)->compare($needle, $haystack));
+        self::assertTrue(ComparatorLocator::get(RecursiveArrayComparator::class)->compare($needle, $haystack));
     }
 
     public function testNotMatches(): void
@@ -54,11 +55,10 @@ class RecursiveArrayLtrComparatorTest extends TestCase
                 'createdAtFrom' => '2020-01-01 00:00:00',
                 'createdAtTo' => '2021-08-01 00:00:00',
             ],
-            'test2' => 1,
-            'test' => ''
+            'test2' => 1
         ];
 
-        self::assertFalse(ComparatorLocator::get(RecursiveLtrArrayComparator::class)->compare($needle, $haystack));
+        self::assertFalse(ComparatorLocator::get(RecursiveArrayComparator::class)->compare($needle, $haystack));
     }
 
     public function testNotMatchesKeyPositions(): void
@@ -70,6 +70,6 @@ class RecursiveArrayLtrComparatorTest extends TestCase
             'source' => json_decode('{"source":"Test Ad","medium":"tiktok","campaign":"Test Campaign"}', true)
         ];
 
-        self::assertTrue(ComparatorLocator::get(RecursiveLtrArrayComparator::class)->compare($needle, $haystack));
+        self::assertTrue(ComparatorLocator::get(RecursiveArrayComparator::class)->compare($needle, $haystack));
     }
 }
