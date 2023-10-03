@@ -79,5 +79,7 @@ class BodyMatcher implements RequestMatcherInterface
         if (is_resource($contents)) {
             return static::readAllResource($contents);
         }
+
+        return '';
     }
 }

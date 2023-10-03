@@ -36,7 +36,7 @@ abstract class AbstractJmsSerializerCreator implements SerializerCreatorInterfac
                 $builder = call_user_func([self::BUILDER_CLASS, 'create']);
 
                 if (null !== $builder && method_exists($builder, 'build')) {
-                    return new JmsSerializerAdapter($builder->build(), static::getFormat()); // @phpstan-ignore-line
+                    return new JmsSerializerAdapter($builder->build(), static::getFormat());
                 }
             } catch (Throwable $throwable) {
                 return null;
