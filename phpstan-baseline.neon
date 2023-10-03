@@ -6,11 +6,6 @@ parameters:
 			path: src/Client.php
 
 		-
-			message: "#^Method Pock\\\\Comparator\\\\ComparatorLocator\\:\\:get\\(\\) should return Pock\\\\Comparator\\\\ComparatorInterface but returns object\\.$#"
-			count: 1
-			path: src/Comparator/ComparatorLocator.php
-
-		-
 			message: "#^Static property Pock\\\\Comparator\\\\ComparatorLocator\\:\\:\\$comparators \\(array\\<Pock\\\\Comparator\\\\ComparatorInterface\\>\\) does not accept array\\<object\\>\\.$#"
 			count: 1
 			path: src/Comparator/ComparatorLocator.php
@@ -19,21 +14,6 @@ parameters:
 			message: "#^Unsafe access to private property Pock\\\\Comparator\\\\ComparatorLocator\\:\\:\\$comparators through static\\:\\:\\.$#"
 			count: 3
 			path: src/Comparator/ComparatorLocator.php
-
-		-
-			message: "#^Parameter \\#1 \\$object_or_class of function method_exists expects object\\|string, mixed given\\.$#"
-			count: 1
-			path: src/Creator/AbstractJmsSerializerCreator.php
-
-		-
-			message: "#^Parameter \\#2 \\$encoders of class Symfony\\\\Component\\\\Serializer\\\\Serializer constructor expects array\\<Symfony\\\\Component\\\\Serializer\\\\Encoder\\\\DecoderInterface\\|Symfony\\\\Component\\\\Serializer\\\\Encoder\\\\EncoderInterface\\>, array\\<int, object\\> given\\.$#"
-			count: 1
-			path: src/Creator/AbstractSymfonySerializerCreator.php
-
-		-
-			message: "#^Method Pock\\\\Factory\\\\CallbackReplyFactory\\:\\:createReply\\(\\) should return Psr\\\\Http\\\\Message\\\\ResponseInterface but returns mixed\\.$#"
-			count: 1
-			path: src/Factory/CallbackReplyFactory.php
 
 		-
 			message: "#^Unsafe access to private property Pock\\\\Factory\\\\JsonSerializerFactory\\:\\:\\$mainSerializer through static\\:\\:\\.$#"
@@ -46,9 +26,9 @@ parameters:
 			path: src/Factory/XmlSerializerFactory.php
 
 		-
-			message: "#^Method Pock\\\\Matchers\\\\CallbackRequestMatcher\\:\\:matches\\(\\) should return bool but returns mixed\\.$#"
+			message: "#^Parameter \\#4 \\$flags of function preg_match expects TFlags of 0\\|256\\|512\\|768, int given\\.$#"
 			count: 1
-			path: src/Matchers/CallbackRequestMatcher.php
+			path: src/Matchers/AbstractRegExpMatcher.php
 
 		-
 			message: "#^Unsafe call to private method Pock\\\\Matchers\\\\ExactHeadersMatcher\\:\\:headerValuesEqual\\(\\) through static\\:\\:\\.$#"
@@ -66,9 +46,9 @@ parameters:
 			path: src/Matchers/JsonBodyMatcher.php
 
 		-
-			message: "#^Method Pock\\\\Matchers\\\\MultipartFormDataMatcher\\:\\:matches\\(\\) should return bool but returns mixed\\.$#"
+			message: "#^Method Pock\\\\Matchers\\\\QueryMatcher\\:\\:parseQuery\\(\\) should return array\\<string, mixed\\> but returns array\\<int\\|string, array\\|string\\>\\.$#"
 			count: 1
-			path: src/Matchers/MultipartFormDataMatcher.php
+			path: src/Matchers/QueryMatcher.php
 
 		-
 			message: "#^Method Pock\\\\Matchers\\\\XmlBodyMatcher\\:\\:sortXmlTags\\(\\) should return string but returns string\\|null\\.$#"
@@ -129,4 +109,3 @@ parameters:
 			message: "#^Parameter \\#3 \\$depth of function json_encode expects int\\<1, max\\>, int given\\.$#"
 			count: 1
 			path: src/PockResponseBuilder.php
-

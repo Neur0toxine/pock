@@ -34,7 +34,7 @@ abstract class AbstractSymfonySerializerCreator implements SerializerCreatorInte
             $encoder = static::getEncoderClass();
 
             return new SymfonySerializerAdapter(
-                new $serializer([new $normalizer()], [new $encoder()]),
+                new $serializer([new $normalizer()], [new $encoder()]), // @phpstan-ignore-line
                 static::getFormat()
             );
         }
