@@ -16,11 +16,6 @@ parameters:
 			path: src/Comparator/ComparatorLocator.php
 
 		-
-			message: "#^Parameter \\#2 \\$encoders of class Symfony\\\\Component\\\\Serializer\\\\Serializer constructor expects array\\<Symfony\\\\Component\\\\Serializer\\\\Encoder\\\\DecoderInterface\\|Symfony\\\\Component\\\\Serializer\\\\Encoder\\\\EncoderInterface\\>, array\\<int, object\\> given\\.$#"
-			count: 1
-			path: src/Creator/AbstractSymfonySerializerCreator.php
-
-		-
 			message: "#^Unsafe access to private property Pock\\\\Factory\\\\JsonSerializerFactory\\:\\:\\$mainSerializer through static\\:\\:\\.$#"
 			count: 2
 			path: src/Factory/JsonSerializerFactory.php

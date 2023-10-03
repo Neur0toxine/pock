@@ -30,13 +30,13 @@ abstract class AbstractJmsSerializerCreator implements SerializerCreatorInterfac
     {
         if (
             class_exists(self::BUILDER_CLASS) &&
-            method_exists(self::BUILDER_CLASS, 'create')
+            method_exists(self::BUILDER_CLASS, 'create') // @phpstan-ignore-line
         ) {
             try {
-                $builder = call_user_func([self::BUILDER_CLASS, 'create']);
+                $builder = call_user_func([self::BUILDER_CLASS, 'create']); // @phpstan-ignore-line
 
-                if (null !== $builder && method_exists($builder, 'build')) {
-                    return new JmsSerializerAdapter($builder->build(), static::getFormat());
+                if (null !== $builder && method_exists($builder, 'build')) { // @phpstan-ignore-line
+                    return new JmsSerializerAdapter($builder->build(), static::getFormat()); // @phpstan-ignore-line
                 }
             } catch (Throwable $throwable) {
                 return null;
